@@ -1,0 +1,104 @@
+:root {
+  --bg: #f7f3ea;
+  --ink: #1a2e1a;
+  --accent: #2f6b4f;
+  --ok: #1f7a4c;
+  --bad: #a33b2b;
+  --muted: #5c6b5c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, #e4efe6 0%, transparent 55%),
+    linear-gradient(180deg, #fbf8f1 0%, var(--bg) 100%);
+  color: var(--ink);
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+
+.lede {
+  color: var(--muted);
+  margin: 0 0 1.75rem;
+  line-height: 1.7;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(47, 107, 79, 0.15);
+  border-radius: 16px;
+  padding: 1.25rem 1.35rem;
+  margin-bottom: 1rem;
+}
+
+.ayah {
+  font-size: 1.65rem;
+  line-height: 2.2;
+  letter-spacing: 0.02em;
+}
+
+.word {
+  display: inline-block;
+  padding: 0.1rem 0.25rem;
+  border-radius: 6px;
+  margin-inline: 0.1rem;
+}
+
+.word.ok {
+  background: rgba(31, 122, 76, 0.15);
+  color: var(--ok);
+}
+
+.word.bad {
+  background: rgba(163, 59, 43, 0.15);
+  color: var(--bad);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+button {
+  font: inherit;
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1.25rem;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid rgba(47, 107, 79, 0.35);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 1rem;
+  color: var(--muted);
+}

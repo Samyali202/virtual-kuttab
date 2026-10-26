@@ -1,0 +1,25 @@
+node_modules/
+.next/
+dist/
+build/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+*.log
+.DS_Store
+content/audio/husary_full/
+content/audio/husary_muallim/*.zip
+content/audio/husary_muallim/**/*.mp3
+!content/audio/husary_muallim_sample/
+!content/audio/HUSARY_MUALLIM_MANIFEST.md
+# Local OSS clones (multi-GB); see vendor/README.md for upstream URLs
+vendor/**
+!vendor/README.md
+*.onnx
+!models/quran-asr-tiny/model.int8.onnx
+.turbo/
+coverage/
+.supabase/

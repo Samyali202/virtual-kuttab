@@ -1,0 +1,16 @@
+---
+description: Virtual Kuttab product constraints for all agents in this repo
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Virtual Kuttab rules
+
+- Product: Listen (**Husary Muallim only**) → Repeat → Recite → **word-level** feedback only (Tarteel-like).
+- **No other qaris** (not Murattal, not Mujawwad, not Alafasy, etc.).
+- **No tajweed auto-scoring** in v1.
+- Grade ASR text vs pinned ayah text — not audio fingerprint vs Sheikh MP3.
+- Stack: Next.js (`apps/web`), FastAPI+sherpa-onnx+`quran-asr-tiny` (`services/asr`), Supabase, R2.
+- Prefer project skills: `virtual-kuttab`, `vk-asr-scoring`, `vk-content-audio`, `vk-listen-recite-ui`.
+- Canonical decision: `docs/PRODUCT-DECISION-TARTEEL-STYLE-HIFZ.md`.
