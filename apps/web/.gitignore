@@ -1,0 +1,5 @@
+.env.production
+.env*.local
+out/
+.next/
+
