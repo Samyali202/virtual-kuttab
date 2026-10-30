@@ -8,18 +8,21 @@ Learner listens to **only Husary Muallim** (Mahmoud Khalil Al-Husary teaching st
 
 **Out of scope for v1:** tajweed rules, phoneme sifat, LiveKit, Rive, LLM fatwa.
 
+**Hifz unit (locked 2026-10-30):** **ayah-by-ayah** only. One ayah = one Listen → Repeat → Recite → feedback cycle. Do **not** present a whole mushaf page / multi-ayah block as the core memorization loop. A later optional **maintenance** mode may show a whole page for review-only users — not v1.
+
 ---
 
 ## Exact user flow
 
 ```
-1. Pick Surah / Ayah (or Hifz range)
+1. Pick Surah / Ayah (or Hifz range) — one ayah at a time
 2. [Listen]  → play Husary MP3 + highlight words as he speaks
 3. [Repeat]  → optional: play ayah (or word-by-word), learner shadows
 4. [Recite]  → learner records ayah into mic
 5. App ASR → compares to FIXED reference text of that ayah
 6. UI: green words OK · amber/red wrong/missing · "أحسنت" if clean
 7. Save attempt to progress (maintain / Hifz tracker)
+8. Advance to next ayah (or redo mistakes on this ayah)
 ```
 
 Important: comparison is **learner speech vs expected ayah TEXT** (via ASR),  
@@ -121,7 +124,7 @@ Husary is only the listening teacher.
 └──────────────────┘
 ```
 
-Cost to start: Supabase free/pro + R2 + one small VPS (2–4 vCPU) for ASR.
+Cost to start: Supabase free/pro + R2 + one small VPS for ASR — **Hetzner CX23** @ Nuremberg (2 vCPU / 4 GB, ~€6/mo; keep running).
 
 ---
 

@@ -8,9 +8,11 @@ alwaysApply: true
 # Virtual Kuttab rules
 
 - Product: Listen (**Husary Muallim only**) → Repeat → Recite → **word-level** feedback only (Tarteel-like).
+- **Hifz unit = one ayah** (not whole mushaf page). Whole-page review = Later only.
 - **No other qaris** (not Murattal, not Mujawwad, not Alafasy, etc.).
 - **No tajweed auto-scoring** in v1.
 - Grade ASR text vs pinned ayah text — not audio fingerprint vs Sheikh MP3.
 - Stack: Next.js (`apps/web`), FastAPI+sherpa-onnx+`quran-asr-tiny` (`services/asr`), Supabase, R2.
+- **Listen karaoke SSoT:** cpfair/quran-align Husary Muallim timings (`scripts/import_cpfair_muallim_timings.py`). Never invent Listen timings with energy/ASR.
 - Prefer project skills: `virtual-kuttab`, `vk-asr-scoring`, `vk-content-audio`, `vk-listen-recite-ui`.
 - Canonical decision: `docs/PRODUCT-DECISION-TARTEEL-STYLE-HIFZ.md`.

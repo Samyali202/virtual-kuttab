@@ -13,6 +13,8 @@ description: >-
 
 Learner **listens** to **Husary Muallim only** (Mahmoud Khalil Al-Husary teaching style), may **repeat**, then **recites**. App grades **word-level** mistakes only (like Tarteel). No tajweed scoring in v1. **No other reciters.**
 
+**Hifz unit:** **ayah-by-ayah** (not whole-page mushaf). Whole-page review = Later maintenance feature only.
+
 Canonical docs (read these first):
 
 - `docs/PRODUCT-DECISION-TARTEEL-STYLE-HIFZ.md`

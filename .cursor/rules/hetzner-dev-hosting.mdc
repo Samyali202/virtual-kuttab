@@ -1,0 +1,14 @@
+---
+description: Hetzner CX23 ASR VPS — keep running; ~€6/mo Nuremberg
+alwaysApply: true
+---
+
+# Hetzner hosting (dev ASR)
+
+- **Role:** ASR FastAPI box only (sherpa-onnx + quran-asr-tiny). Next.js → Vercel/Pages; audio → R2; DB → Supabase.
+- **Locked plan:** Hetzner Cloud **CX23** — **2 vCPU / 4 GB RAM / 40 GB NVMe** (~**€5.99/mo** cap excl. VAT). Scale to **CX33** (4 vCPU / 8 GB) if concurrency needs it.
+- **Region (locked):** **Nuremberg `nbg1`**. Fallback: **Falkenstein `fsn1`**. Avoid **Helsinki `hel1`** for ME learners.
+- **Live server:** `vk-asr` @ **2.31.89.146** — SSH: `ssh -i ~/.ssh/vk-asr_hetzner root@2.31.89.146`
+- **ASR service:** systemd `vk-asr` on port **8088** — health `http://2.31.89.146:8088/health` — code `/opt/vk-asr`
+- **Billing choice (user lock):** Keep the server **running**; accept the **~€6/mo** monthly cap. **Do not delete** (or nag to destroy) unless the user explicitly asks. Power-off still bills the same, so leaving it on is fine.
+- **Not preferred:** Vultr / dataforest for this box (more expensive for the same class).
