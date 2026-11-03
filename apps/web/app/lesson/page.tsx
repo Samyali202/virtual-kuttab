@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  SURAH_META,
   activeWordIndex,
   paintScoreWords,
   parseTimingsJson,
@@ -16,11 +15,28 @@ import {
   type WordTiming,
 } from "../../lib/content";
 import { MicPermissionSheet } from "../../components/MicPermissionSheet";
-import { IconBackRtl, IconList } from "../../components/NavIcons";
+import { MicStatusButton } from "../../components/MicStatusButton";
+import {
+  IconBackRtl,
+  IconBook,
+  IconChevronLeft,
+  IconChevronRight,
+  IconTranslate,
+} from "../../components/NavIcons";
+import { useI18n } from "../../components/I18nProvider";
 import { OnboardingSheet } from "../../components/OnboardingSheet";
+import { toLatinDigits } from "../../lib/digits";
 import { applySettingsToDom, loadSettings } from "../../lib/settings";
 import { saveProgress } from "../../lib/progress";
 import { recordScoreAttempt } from "../../lib/stats";
+import { AYAH_COUNTS } from "../../lib/surah-catalog";
+import { SURAH_META, surahName } from "../../lib/surah-meta";
+import {
+  getAyahTranslation,
+  hasTranslationTab,
+  translationForLocale,
+  type TextView,
+} from "../../lib/translations";
 import { supabase } from "../../lib/supabase";
 
 function asrBase(): string {
@@ -49,10 +65,14 @@ type LessonPhase =
   | "surah_done"
   | "mic_denied";
 
-const SENSITIVITY_OPTIONS: { value: SensitivityMode; ar: string; hint: string }[] = [
-  { value: "child", ar: "مبتدئ", hint: "تسامح أعلى في النطق" },
-  { value: "beginner", ar: "متوسط", hint: "دقة متوسطة" },
-  { value: "professional", ar: "مُتقِن", hint: "دقة عالية" },
+const SENSITIVITY_OPTIONS: {
+  value: SensitivityMode;
+  labelKey: "settings.levelChild" | "settings.levelBeginner" | "settings.levelPro";
+  hintKey: "lesson.levelHintChild" | "lesson.levelHintBeginner" | "lesson.levelHintPro";
+}[] = [
+  { value: "child", labelKey: "settings.levelChild", hintKey: "lesson.levelHintChild" },
+  { value: "beginner", labelKey: "settings.levelBeginner", hintKey: "lesson.levelHintBeginner" },
+  { value: "professional", labelKey: "settings.levelPro", hintKey: "lesson.levelHintPro" },
 ];
 
 function fileKey(surah: number, ayah: number) {
@@ -74,6 +94,7 @@ function formatTime(sec: number) {
 }
 
 function LessonInner() {
+  const { t, locale, dir } = useI18n();
   const router = useRouter();
   const search = useSearchParams();
   const initialSurah = Math.min(114, Math.max(1, Number(search.get("surah")) || 1));
@@ -89,6 +110,7 @@ function LessonInner() {
   const karaokeOnRef = useRef(false);
   const wordReplayStopRef = useRef<(() => void) | null>(null);
   const preferAyahRef = useRef(initialAyah);
+  const ayahStageRef = useRef<HTMLElement | null>(null);
 
   const applyParsedTimings = useCallback((tokens: string[], durationSec: number) => {
     const real = parseTimingsJson(timingsJsonRef.current, tokens.length, durationSec);
@@ -115,17 +137,22 @@ function LessonInner() {
   const [hasAudio, setHasAudio] = useState(true);
   const [phase, setPhase] = useState<LessonPhase>("loading_ayah");
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState("استمع للمعلّم، ثم سجّل من حفظك.");
+  const [message, setMessage] = useState("");
   const [words, setWords] = useState<WordStatus[]>([]);
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [mode, setMode] = useState<SensitivityMode>("beginner");
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [levelOpen, setLevelOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showMicSheet, setShowMicSheet] = useState(false);
   const [showInstallHint, setShowInstallHint] = useState(false);
+  const [textView, setTextView] = useState<TextView>("mushaf");
+  const [translation, setTranslation] = useState<string | null>(null);
+  const [translationLoading, setTranslationLoading] = useState(false);
+
+  const showTranslationTab = hasTranslationTab(locale);
+  const translationMeta = translationForLocale(locale);
 
   useEffect(() => {
     setMode(loadMode());
@@ -135,21 +162,106 @@ function LessonInner() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPickerOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [pickerOpen]);
+
+  // Re-localize chrome messages when language changes (avoid EN leftovers in AR).
+  useEffect(() => {
+    switch (phase) {
+      case "listening":
+        setMessage(t("lesson.promptRepeat"));
+        break;
+      case "ready_recite":
+        setMessage(t("lesson.promptAfterListen"));
+        break;
+      case "recording":
+        setMessage(t("lesson.recording"));
+        break;
+      case "scoring":
+        setMessage(t("lesson.scoring"));
+        break;
+      case "mic_denied":
+        setMessage(t("lesson.micDenied"));
+        break;
+      case "success":
+        setMessage(t("lesson.perfect"));
+        break;
+      case "surah_done":
+        setMessage(t("lesson.surahDone"));
+        break;
+      case "retry":
+        break;
+      default:
+        setMessage(t("lesson.promptIdle"));
+        break;
+    }
+    // Only when locale changes — not on every phase transition.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale, t]);
+
+  // Arabic UI = mushaf only; switching to ar closes translation pane.
+  useEffect(() => {
+    if (!showTranslationTab) setTextView("mushaf");
+  }, [showTranslationTab]);
+
+  useEffect(() => {
+    if (!showTranslationTab || textView !== "translation") {
+      setTranslation(null);
+      setTranslationLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setTranslationLoading(true);
+    void getAyahTranslation(locale, surah, ayah).then((text) => {
+      if (cancelled) return;
+      setTranslation(text);
+      setTranslationLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [showTranslationTab, textView, locale, surah, ayah]);
+
   const current = useMemo(
     () => ayahs.find((a) => a.ayah === ayah) || null,
     [ayahs, ayah],
   );
   const meta = SURAH_META[surah];
+  const localizedSurah = surahName(surah, locale);
   const badWords = useMemo(
     () => words.filter((w) => w.status === "bad"),
     [words],
   );
-  const modeLabel =
-    SENSITIVITY_OPTIONS.find((o) => o.value === mode)?.ar ?? "متوسط";
-
   const resetWords = useCallback((text: string) => {
     setWords(splitWords(text).map((t) => ({ ref_token: t, status: "pending", active: false })));
   }, []);
+
+  const activeWordIdx = useMemo(
+    () => words.findIndex((w) => w.active),
+    [words],
+  );
+
+  // Keep karaoke highlight in view on long ayahs (scroll stage up with the word).
+  useEffect(() => {
+    if (activeWordIdx < 0 || textView !== "mushaf") return;
+    const stage = ayahStageRef.current;
+    if (!stage) return;
+    const el = stage.querySelector(`[data-word-idx="${activeWordIdx}"]`);
+    if (!(el instanceof HTMLElement)) return;
+    const stageRect = stage.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    const delta =
+      elRect.top + elRect.height / 2 - (stageRect.top + stageRect.height / 2);
+    if (Math.abs(delta) < 8) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    stage.scrollBy({ top: delta, behavior: reduce ? "auto" : "smooth" });
+  }, [activeWordIdx, textView]);
 
   const rebuildTimings = useCallback(() => {
     const el = audioRef.current;
@@ -225,11 +337,7 @@ function LessonInner() {
       setProgress(0);
       setDuration(0);
       setPhase(url ? "idle" : "empty_audio");
-      setMessage(
-        !url
-          ? "لا يتوفر صوت المعلّم لهذه الآية — اختر آية أخرى."
-          : "استمع للمعلّم، ثم سجّل من حفظك.",
-      );
+      setMessage(!url ? t("lesson.noAudio") : t("lesson.promptIdle"));
       saveProgress({ surah, ayah });
       audioRef.current?.pause();
       audioRef.current?.load();
@@ -237,7 +345,7 @@ function LessonInner() {
     return () => {
       cancelled = true;
     };
-  }, [surah, ayah, current, resetWords]);
+  }, [surah, ayah, current, resetWords, t]);
 
   useEffect(() => {
     const el = audioRef.current;
@@ -283,7 +391,7 @@ function LessonInner() {
       setProgress(el.duration || 0);
       setWords((prev) => prev.map((w) => ({ ...w, active: false })));
       setPhase("ready_recite");
-      setMessage("أحسنت الاستماع — سجّل الآن من حفظك");
+      setMessage(t("lesson.promptAfterListen"));
     };
 
     el.addEventListener("loadedmetadata", onMeta);
@@ -314,10 +422,10 @@ function LessonInner() {
     setProgress(0);
     try {
       await audioRef.current.play();
-      setMessage("استمع وكرّر بعد الشيخ.");
+      setMessage(t("lesson.promptRepeat"));
     } catch {
       setPhase("idle");
-      setMessage("تعذّر تشغيل الصوت.");
+      setMessage(t("lesson.audioFail"));
     }
   }
 
@@ -328,7 +436,7 @@ function LessonInner() {
     karaokeOnRef.current = false;
     setWords((prev) => prev.map((w) => ({ ...w, active: false })));
     setPhase("idle");
-    setMessage("توقّف الاستماع — سجّل أو استمع مجدداً.");
+    setMessage(t("lesson.promptStopped"));
   }
 
   function seekListen(value: number) {
@@ -344,7 +452,7 @@ function LessonInner() {
     audioRef.current?.pause();
     wordReplayStopRef.current?.();
     resetWords(current.text_uthmani);
-    setMessage("جاري التسجيل… ثم اضغط إيقاف.");
+    setMessage(t("lesson.recording"));
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const rec = new MediaRecorder(stream);
@@ -361,7 +469,7 @@ function LessonInner() {
       setPhase("recording");
     } catch {
       setPhase("mic_denied");
-      setMessage("يلزم السماح بالميكروفون من إعدادات المتصفح لإكمال التسجيل.");
+      setMessage(t("lesson.micDenied"));
     }
   }
 
@@ -382,7 +490,7 @@ function LessonInner() {
     if (!current) return;
     setBusy(true);
     setPhase("scoring");
-    setMessage("جاري المقارنة…");
+    setMessage(t("lesson.scoring"));
     resetWords(current.text_uthmani);
     try {
       const form = new FormData();
@@ -405,10 +513,15 @@ function LessonInner() {
       setPhase(perfect ? "success" : badCount > 0 ? "retry" : "idle");
       setMessage(
         perfect
-          ? log.message_ar || "أحسنت، بارك الله فيك"
+          ? log.message_ar || t("lesson.perfect")
           : badCount > 0
-            ? log.message_ar || "أعد الكلمات المظلّلة، ثم سجّل مجدداً."
-            : log.message_ar || "تم التقييم.",
+            ? log.message_ar ||
+              `${toLatinDigits(badCount)} ${
+                badCount === 1
+                  ? t("lesson.wordsNeedReviewOne")
+                  : t("lesson.wordsNeedReviewMany")
+              }`
+            : log.message_ar || t("lesson.scoring"),
       );
       saveProgress({
         surah: current.surah,
@@ -449,10 +562,20 @@ function LessonInner() {
       }
     } catch (e) {
       setPhase("idle");
-      setMessage(`تعذّر التقييم: ${String(e)}`);
+      setMessage(`${t("lesson.scoreFail")}: ${String(e)}`);
       resetWords(current.text_uthmani);
     } finally {
       setBusy(false);
+    }
+  }
+
+  function stopLessonAudio() {
+    karaokeOnRef.current = false;
+    wordReplayStopRef.current?.();
+    wordReplayStopRef.current = null;
+    audioRef.current?.pause();
+    if (mediaRef.current?.state === "recording") {
+      mediaRef.current.stop();
     }
   }
 
@@ -464,11 +587,59 @@ function LessonInner() {
       preferAyahRef.current = next.ayah;
       setAyah(next.ayah);
       syncUrl(surah, next.ayah);
-      setMessage("استمع للمعلّم، ثم سجّل من حفظك.");
+      setMessage(t("lesson.promptIdle"));
       return;
     }
     setPhase("surah_done");
-    setMessage("أكملت السورة — بارك الله فيك");
+    setMessage(t("lesson.surahDone"));
+  }
+
+  /** Arrow control: advance ayah, or roll into next surah (not surah_done banner). */
+  function navigateNextAyah() {
+    stopLessonAudio();
+    if (!ayahs.length) return;
+    const idx = ayahs.findIndex((a) => a.ayah === ayah);
+    const next = ayahs[idx + 1];
+    if (next) {
+      preferAyahRef.current = next.ayah;
+      setAyah(next.ayah);
+      syncUrl(surah, next.ayah);
+      setPhase("loading_ayah");
+      setMessage(t("lesson.promptIdle"));
+      return;
+    }
+    if (surah >= 114) return;
+    const nextSurah = surah + 1;
+    preferAyahRef.current = 1;
+    setSurah(nextSurah);
+    setAyah(1);
+    syncUrl(nextSurah, 1);
+    setPhase("loading_ayah");
+    setMessage(t("lesson.promptIdle"));
+  }
+
+  function navigatePrevAyah() {
+    stopLessonAudio();
+    if (!ayahs.length) return;
+    const idx = ayahs.findIndex((a) => a.ayah === ayah);
+    if (idx > 0) {
+      const prev = ayahs[idx - 1];
+      preferAyahRef.current = prev.ayah;
+      setAyah(prev.ayah);
+      syncUrl(surah, prev.ayah);
+      setPhase("loading_ayah");
+      setMessage(t("lesson.promptIdle"));
+      return;
+    }
+    if (surah <= 1) return;
+    const prevSurah = surah - 1;
+    const last = AYAH_COUNTS[prevSurah] || 1;
+    preferAyahRef.current = last;
+    setSurah(prevSurah);
+    setAyah(last);
+    syncUrl(prevSurah, last);
+    setPhase("loading_ayah");
+    setMessage(t("lesson.promptIdle"));
   }
 
   function goNextSurah() {
@@ -476,6 +647,12 @@ function LessonInner() {
     preferAyahRef.current = 1;
     setSurah(nextSurah);
   }
+
+  const canGoPrev = !(surah === 1 && ayah === 1);
+  const canGoNext = !(
+    surah === 114 &&
+    ayah === (AYAH_COUNTS[114] || ayahs[ayahs.length - 1]?.ayah || 6)
+  );
 
   function replayWord(wordIndex: number) {
     const el = audioRef.current;
@@ -491,7 +668,7 @@ function LessonInner() {
       timingsRef.current.find((t) => t.i === wordIndex) ||
       timingsRef.current[wordIndex];
     if (!timed) {
-      setMessage("لا يتوفر توقيت لهذه الكلمة — استمع للآية كاملة.");
+      setMessage(t("lesson.noWordTiming"));
       return;
     }
     karaokeOnRef.current = false;
@@ -519,14 +696,14 @@ function LessonInner() {
     el.addEventListener("timeupdate", onTime);
     void el.play().catch(() => {
       el.removeEventListener("timeupdate", onTime);
-      setMessage("تعذّر تشغيل مقطع الكلمة.");
+      setMessage(t("lesson.wordPlayFail"));
     });
   }
 
   function changeSurah(id: number) {
     preferAyahRef.current = 1;
     setSurah(id);
-    setPickerOpen(false);
+    // Keep picker open so the learner can pick the ayah next.
   }
 
   function changeAyah(id: number) {
@@ -538,31 +715,36 @@ function LessonInner() {
 
   const primary = useMemo(() => {
     if (phase === "listening") {
-      return { label: "إيقاف الاستماع", action: "stop_listen" as const, pulse: false, stop: false };
+      return { label: t("lesson.stopListen"), action: "stop_listen" as const, pulse: false, stop: false };
     }
     if (phase === "recording") {
-      return { label: "إيقاف", action: "stop_recite" as const, pulse: false, stop: true };
+      return { label: t("lesson.stopRecord"), action: "stop_recite" as const, pulse: false, stop: true };
     }
     if (phase === "scoring") {
-      return { label: "جاري المقارنة…", action: "none" as const, pulse: false, stop: false };
+      return { label: t("lesson.scoring"), action: "none" as const, pulse: false, stop: false };
     }
     if (phase === "success") {
-      return { label: "التالية ←", action: "next" as const, pulse: false, stop: false };
+      return { label: t("lesson.nextAyah"), action: "next" as const, pulse: false, stop: false };
     }
     if (phase === "surah_done") {
-      return { label: "السورة التالية", action: "next_surah" as const, pulse: false, stop: false };
+      return { label: t("lesson.nextSurah"), action: "next_surah" as const, pulse: false, stop: false };
     }
     if (phase === "retry") {
-      return { label: "أعد التسجيل", action: "recite" as const, pulse: false, stop: false };
+      return { label: t("lesson.retryRecord"), action: "recite" as const, pulse: false, stop: false };
     }
     if (phase === "ready_recite") {
-      return { label: "سجّل الآن", action: "recite" as const, pulse: true, stop: false };
+      return { label: t("lesson.recordNow"), action: "recite" as const, pulse: true, stop: false };
     }
     if (phase === "mic_denied") {
-      return { label: "حاول التسجيل", action: "recite" as const, pulse: false, stop: false };
+      return { label: t("mic.tryAgain"), action: "recite" as const, pulse: false, stop: false };
     }
-    return { label: "استمع", action: "listen" as const, pulse: false, stop: false };
-  }, [phase]);
+    return { label: t("lesson.listen"), action: "listen" as const, pulse: false, stop: false };
+  }, [phase, t]);
+
+  const showDockMic =
+    primary.action === "recite" ||
+    primary.action === "stop_recite" ||
+    phase === "mic_denied";
 
   function runPrimary() {
     switch (primary.action) {
@@ -608,8 +790,7 @@ function LessonInner() {
       />
       <MicPermissionSheet
         open={showMicSheet}
-        onAllow={() => {
-          window.localStorage.setItem("vk_mic_explained", "true");
+        onAllowed={() => {
           setShowMicSheet(false);
           void beginReciteCapture();
         }}
@@ -617,7 +798,7 @@ function LessonInner() {
       />
       {showInstallHint ? (
         <div className="install-toast" role="status">
-          <span>أضف الكتّاب للشاشة الرئيسية</span>
+          <span>{t("lesson.installHint")}</span>
           <button
             type="button"
             onClick={() => {
@@ -625,105 +806,172 @@ function LessonInner() {
               setShowInstallHint(false);
             }}
           >
-            لاحقاً
+            {t("lesson.later")}
           </button>
         </div>
       ) : null}
-      <header className="lesson-top">
-        <Link href="/" className="top-home" aria-label="الرئيسية">
+      <header className="lesson-top" dir={dir} lang={locale}>
+        <Link href="/" className="top-home" aria-label={t("common.home")}>
           <IconBackRtl />
         </Link>
-        <Link href="/browse" className="nav-chip" title="تصفّح السور" aria-label="السور">
-          <IconList />
-          <span>السور</span>
-        </Link>
-        <button
-          type="button"
-          className="breadcrumb"
-          onClick={() => {
-            setPickerOpen((v) => !v);
-            setLevelOpen(false);
-          }}
-          aria-expanded={pickerOpen}
-        >
-          {meta ? `${meta.ar} · آية ${ayah}` : "…"}
-        </button>
-        <button
-          type="button"
-          className="level-trigger"
-          title="مستوى الدقة"
-          aria-label="مستوى الدقة"
-          aria-expanded={levelOpen}
-          onClick={() => {
-            setLevelOpen((v) => !v);
-            setPickerOpen(false);
-          }}
-        >
-          {modeLabel}
-        </button>
+        <nav className="ayah-chip-nav" aria-label={t("lesson.labelAyah")} dir="ltr">
+          <button
+            type="button"
+            className="ayah-stepper-btn"
+            aria-label={t("lesson.prevAyah")}
+            disabled={!canGoPrev || busy || phase === "recording" || phase === "scoring"}
+            onClick={navigatePrevAyah}
+          >
+            <IconChevronLeft />
+          </button>
+          <button
+            type="button"
+            className="breadcrumb"
+            dir={dir}
+            lang={locale}
+            onClick={() => setPickerOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={pickerOpen}
+            aria-label={`${localizedSurah} — ${t("common.ayah")} ${toLatinDigits(ayah)}`}
+          >
+            <span className="breadcrumb-surah">{localizedSurah || "…"}</span>
+            <span className="breadcrumb-ayah">
+              {t("common.ayah")} {toLatinDigits(ayah)}
+            </span>
+          </button>
+          <button
+            type="button"
+            className="ayah-stepper-btn"
+            aria-label={t("lesson.nextAyah")}
+            disabled={!canGoNext || busy || phase === "recording" || phase === "scoring"}
+            onClick={navigateNextAyah}
+          >
+            <IconChevronRight />
+          </button>
+        </nav>
       </header>
 
       {pickerOpen ? (
-        <div className="picker-sheet" role="dialog" aria-label="اختيار الآية">
-          <div className="chip">
-            <label htmlFor="surah">السورة</label>
-            <select
-              id="surah"
-              value={surah}
-              onChange={(e) => changeSurah(Number(e.target.value))}
-            >
-              {surahIds.map((id) => (
-                <option key={id} value={id}>
-                  {id}. {SURAH_META[id].ar}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="chip">
-            <label htmlFor="ayah">الآية</label>
-            <select
-              id="ayah"
-              value={ayah}
-              onChange={(e) => changeAyah(Number(e.target.value))}
-              disabled={!ayahs.length}
-            >
-              {ayahs.map((a) => (
-                <option key={a.ayah} value={a.ayah}>
-                  {a.ayah}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      ) : null}
-
-      {levelOpen ? (
-        <div className="level-sheet" role="group" aria-label="مستوى الدقة">
-          {SENSITIVITY_OPTIONS.map((opt) => (
+        <div
+          className="sheet-backdrop"
+          role="presentation"
+          onClick={() => setPickerOpen(false)}
+        >
+          <div
+            className="sheet ayah-picker-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("lesson.pickAyah")}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="sheet-title">{t("lesson.pickAyah")}</h2>
+            <div className="ayah-picker-fields">
+              <div className="ayah-picker-field">
+                <label htmlFor="lesson-surah-select">{t("lesson.labelSurah")}</label>
+                <select
+                  id="lesson-surah-select"
+                  className="ayah-picker-select"
+                  value={surah}
+                  onChange={(e) => changeSurah(Number(e.target.value))}
+                >
+                  {surahIds.map((id) => (
+                    <option key={id} value={id}>
+                      {toLatinDigits(id)}. {surahName(id, locale)}
+                      {locale !== "ar" ? ` — ${SURAH_META[id].ar}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="ayah-picker-field">
+                <label htmlFor="lesson-ayah-select">{t("lesson.labelAyah")}</label>
+                <select
+                  id="lesson-ayah-select"
+                  className="ayah-picker-select"
+                  value={ayah}
+                  onChange={(e) => changeAyah(Number(e.target.value))}
+                  disabled={!ayahs.length}
+                >
+                  {ayahs.map((a) => (
+                    <option key={a.ayah} value={a.ayah}>
+                      {toLatinDigits(a.ayah)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <button
-              key={opt.value}
               type="button"
-              className={mode === opt.value ? "mode-pill active" : "mode-pill"}
-              title={opt.hint}
-              aria-pressed={mode === opt.value}
-              onClick={() => {
-                setMode(opt.value);
-                window.localStorage.setItem("vk_sensitivity", opt.value);
-                setLevelOpen(false);
-              }}
+              className="sheet-cta"
+              onClick={() => setPickerOpen(false)}
             >
-              {opt.ar}
+              {t("common.done")}
             </button>
-          ))}
+          </div>
         </div>
       ) : null}
 
-      <section className="ayah-stage" aria-label="نص الآية">
+      {showTranslationTab ? (
+        <div className="text-view-tabs" role="tablist" aria-label={t("lesson.ayahText")}>
+          <button
+            type="button"
+            role="tab"
+            className={textView === "mushaf" ? "text-view-tab active" : "text-view-tab"}
+            aria-selected={textView === "mushaf"}
+            onClick={() => setTextView("mushaf")}
+          >
+            <IconBook />
+            <span>{t("lesson.viewMushaf")}</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            className={textView === "translation" ? "text-view-tab active" : "text-view-tab"}
+            aria-selected={textView === "translation"}
+            onClick={() => setTextView("translation")}
+          >
+            <IconTranslate />
+            <span>{t("lesson.viewTranslation")}</span>
+          </button>
+        </div>
+      ) : null}
+
+      <section
+        ref={ayahStageRef}
+        className="ayah-stage"
+        aria-label={t("lesson.ayahText")}
+        dir={textView === "mushaf" ? "rtl" : translationMeta?.dir ?? "ltr"}
+        lang={textView === "mushaf" ? "ar" : locale}
+      >
+        <div className="ayah-stage-inner">
         {loadErr ? <p className="status err">{loadErr}</p> : null}
-        {phase === "loading_ayah" && !words.length ? (
+        {textView === "translation" && showTranslationTab ? (
+          translationLoading ? (
+            <p className="translation-ayah" role="status">
+              {t("lesson.translationLoading")}
+            </p>
+          ) : translation ? (
+            <p
+              className={[
+                "translation-ayah",
+                phase === "listening" || phase === "ready_recite" ? "ayah-active" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              dir={translationMeta?.dir ?? "ltr"}
+              lang={locale}
+            >
+              {translation}{" "}
+              <span className="translation-ayah-num latin-num">
+                ({toLatinDigits(ayah)})
+              </span>
+            </p>
+          ) : (
+            <p className="translation-ayah muted">{t("lesson.translationMissing")}</p>
+          )
+        ) : phase === "loading_ayah" && !words.length ? (
           <div
             className="ayah-skeleton-lines"
-            aria-label="جارٍ تحميل الآية…"
+            aria-label={t("lesson.loadingAyah")}
             role="status"
           >
             <span />
@@ -731,10 +979,11 @@ function LessonInner() {
             <span />
           </div>
         ) : (
-          <p className="ayah" lang="ar">
+          <p className="ayah mushaf-ar" lang="ar" dir="rtl">
             {words.map((w, i) => (
               <span
                 key={`${i}-${w.ref_token}`}
+                data-word-idx={i}
                 className={[
                   "word",
                   w.status === "ok" ? "ok" : "",
@@ -749,11 +998,15 @@ function LessonInner() {
               </span>
             ))}
             {words.length && ayah ? (
-              <span className="ayah-end" title={`آية ${ayah}`} aria-label={`آية ${ayah}`}>
+              <span
+                className="ayah-end"
+                title={`${t("common.ayah")} ${toLatinDigits(ayah)}`}
+                aria-label={`${t("common.ayah")} ${toLatinDigits(ayah)}`}
+              >
                 <span className="ayah-end-ornament" aria-hidden="true">
                   {"\uFD3E"}
                 </span>
-                <span className="ayah-end-num">{ayah}</span>
+                <span className="ayah-end-num">{toLatinDigits(ayah)}</span>
                 <span className="ayah-end-ornament" aria-hidden="true">
                   {"\uFD3F"}
                 </span>
@@ -764,30 +1017,32 @@ function LessonInner() {
 
         {phase === "success" ? (
           <div className="result-banner ok" role="status">
-            <p>أحسنت، بارك الله فيك</p>
+            <p>{t("lesson.perfect")}</p>
           </div>
         ) : null}
 
         {phase === "surah_done" ? (
           <div className="result-banner ok" role="status">
-            <p>أكملت سورة {meta?.ar ?? ""}</p>
+            <p>{t("lesson.surahDoneTitle", { name: localizedSurah })}</p>
             <Link className="result-link" href="/browse">
-              اختر سورة أخرى
+              {t("lesson.pickOtherSurah")}
             </Link>
           </div>
         ) : null}
 
         {phase === "retry" && badWords.length ? (
-          <div className="mistake-sheet" role="region" aria-label="كلمات للمراجعة">
+          <div className="mistake-sheet" role="region" aria-label={t("lesson.wordsNeedReviewMany")}>
             <p className="mistake-title">
-              {badWords.length}{" "}
-              {badWords.length === 1 ? "كلمة تحتاج مراجعة" : "كلمات تحتاج مراجعة"}
+              {toLatinDigits(badWords.length)}{" "}
+              {badWords.length === 1
+                ? t("lesson.wordsNeedReviewOne")
+                : t("lesson.wordsNeedReviewMany")}
             </p>
             <ul className="mistake-list">
               {words.map((w, i) =>
                 w.status === "bad" ? (
                   <li key={`${i}-${w.ref_token}`}>
-                    <span className="mistake-token" lang="ar">
+                    <span className="mistake-token mushaf-ar" lang="ar" dir="rtl">
                       {w.ref_token}
                     </span>
                     <span className="mistake-actions">
@@ -796,7 +1051,7 @@ function LessonInner() {
                         className="mistake-play"
                         onClick={() => replayWord(i)}
                         disabled={!hasAudio || busy}
-                        title="استمع للمعلّم"
+                        title={t("lesson.hearTeacher")}
                       >
                         ▶
                       </button>
@@ -806,7 +1061,7 @@ function LessonInner() {
                         onClick={() => void startRecite()}
                         disabled={busy}
                       >
-                        حاول
+                        {t("lesson.tryWord")}
                       </button>
                     </span>
                   </li>
@@ -815,88 +1070,150 @@ function LessonInner() {
             </ul>
           </div>
         ) : null}
+        </div>
       </section>
 
       <audio ref={audioRef} src={audioUrl} preload="metadata" className="sr-only" />
 
       <footer className="dock">
-        <div className="listen-bar" data-listening={phase === "listening" ? "true" : "false"}>
-          <div className="listen-bar-label">
-            <span>تقدّم استماع المعلّم</span>
-            <span
-              className={phase === "listening" ? "listening-dot on" : "listening-dot"}
-              aria-hidden="true"
-            />
-          </div>
-          <div className="listen-slider-wrap">
-            <div className="listen-fill-track" aria-hidden="true">
-              <div
-                className="listen-fill"
-                style={{
-                  width:
-                    duration > 0
-                      ? `${Math.min(100, (progress / duration) * 100)}%`
-                      : "0%",
-                }}
+        <div className="dock-transport">
+          <div
+            className={
+              phase === "listening" ? "listen-bar listening" : "listen-bar quiet"
+            }
+            data-listening={phase === "listening" ? "true" : "false"}
+          >
+            {phase === "listening" ? (
+              <div className="listen-bar-label">
+                <label htmlFor="listen-progress">{t("lesson.listenProgress")}</label>
+                <span className="listening-dot on" aria-hidden="true" />
+              </div>
+            ) : (
+              <label className="sr-only" htmlFor="listen-progress">
+                {t("lesson.listenProgress")}
+              </label>
+            )}
+            <div className="listen-slider-wrap">
+              <div className="listen-fill-track" aria-hidden="true">
+                <div
+                  className="listen-fill"
+                  style={{
+                    width:
+                      duration > 0
+                        ? `${Math.min(100, (progress / duration) * 100)}%`
+                        : "0%",
+                  }}
+                />
+              </div>
+              <input
+                id="listen-progress"
+                className="listen-track"
+                type="range"
+                min={0}
+                max={duration || 1}
+                step={0.01}
+                value={Math.min(progress, duration || 0)}
+                disabled={!hasAudio || !duration || phase !== "listening"}
+                onChange={(e) => seekListen(Number(e.target.value))}
+                aria-valuemin={0}
+                aria-valuemax={duration || 0}
+                aria-valuenow={progress}
+                aria-valuetext={t("lesson.progressOf", {
+                  current: formatTime(progress),
+                  total: formatTime(duration),
+                })}
               />
             </div>
-            <label className="sr-only" htmlFor="listen-progress">
-              تقدّم الاستماع
-            </label>
-            <input
-              id="listen-progress"
-              className="listen-track"
-              type="range"
-              min={0}
-              max={duration || 1}
-              step={0.01}
-              value={Math.min(progress, duration || 0)}
-              disabled={!hasAudio || !duration}
-              onChange={(e) => seekListen(Number(e.target.value))}
-              aria-valuemin={0}
-              aria-valuemax={duration || 0}
-              aria-valuenow={progress}
-              aria-valuetext={`${formatTime(progress)} من ${formatTime(duration)}`}
-            />
+            {phase === "listening" || progress > 0 ? (
+              <div className="listen-times" aria-hidden="true">
+                <span>{formatTime(progress)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+            ) : null}
           </div>
-          <div className="listen-times" aria-hidden="true">
-            <span>{formatTime(progress)}</span>
-            <span>{formatTime(duration)}</span>
+
+          <div className="dock-level-row">
+            <label htmlFor="lesson-level-select">{t("settings.level")}</label>
+            <select
+              id="lesson-level-select"
+              className="dock-level-select"
+              value={mode}
+              title={
+                SENSITIVITY_OPTIONS.find((o) => o.value === mode)
+                  ? t(SENSITIVITY_OPTIONS.find((o) => o.value === mode)!.hintKey)
+                  : undefined
+              }
+              onChange={(e) => {
+                const next = e.target.value as SensitivityMode;
+                setMode(next);
+                window.localStorage.setItem("vk_sensitivity", next);
+              }}
+            >
+              {SENSITIVITY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {t(opt.labelKey)}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
-        <div className="actions actions-single">
-          <button
-            type="button"
-            className={[
-              primary.stop ? "stop" : "",
-              primary.pulse ? "cta-pulse" : "",
-            ]
-              .filter(Boolean)
-              .join(" ") || undefined}
-            onClick={runPrimary}
-            disabled={primaryDisabled}
-          >
-            {primary.label}
-          </button>
+        {phase === "mic_denied" ? (
+          <div className="mic-denied-panel" lang={locale} dir={dir}>
+            <MicStatusButton
+              onGranted={() => {
+                void beginReciteCapture();
+              }}
+            />
+          </div>
+        ) : null}
+
+        <div className={showDockMic ? "dock-cta-row with-mic" : "dock-cta-row"}>
+          {showDockMic && phase !== "mic_denied" ? (
+            <MicStatusButton
+              compact
+              className="lesson-mic-chip"
+              onGranted={() => {
+                if (primary.action === "recite") void beginReciteCapture();
+              }}
+            />
+          ) : null}
+          <div className="actions actions-single">
+            <button
+              type="button"
+              className={[
+                primary.stop ? "stop" : "",
+                primary.pulse ? "cta-pulse" : "",
+              ]
+                .filter(Boolean)
+                .join(" ") || undefined}
+              onClick={runPrimary}
+              disabled={primaryDisabled}
+            >
+              {primary.label}
+            </button>
+          </div>
         </div>
 
         {phase === "ready_recite" || phase === "idle" || phase === "retry" ? (
           <button type="button" className="dock-link" onClick={() => void playListen()} disabled={!hasAudio || busy}>
-            استمع مجدداً
+            {t("lesson.listenAgain")}
           </button>
         ) : null}
 
         {phase === "surah_done" ? (
           <Link className="dock-link" href="/browse">
-            تصفّح السور
+            {t("common.browseSurahs")}
           </Link>
         ) : null}
 
         {phase !== "success" && phase !== "retry" && phase !== "surah_done" ? (
           <p
             className={
-              message.startsWith("تعذّر") || phase === "mic_denied"
+              phase === "mic_denied" ||
+              message === t("lesson.audioFail") ||
+              message === t("lesson.wordPlayFail") ||
+              message.startsWith(t("lesson.scoreFail"))
                 ? "status err"
                 : "status"
             }

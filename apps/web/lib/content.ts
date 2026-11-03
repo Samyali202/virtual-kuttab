@@ -1,29 +1,27 @@
 export type Ayah = { surah: number; ayah: number; text_uthmani: string };
 export type AyahAudio = { surah: number; ayah: number; audio_url: string };
 
-export { SURAH_META } from "./surah-meta";
+export { SURAH_META, surahName } from "./surah-meta";
+export type { SurahMeta } from "./surah-meta";
 
 export function splitWords(text: string): string[] {
   return text.trim().split(/\s+/).filter(Boolean);
 }
 
-const ARABIC_INDIC = "٠١٢٣٤٥٦٧٨٩";
-
-/** Eastern Arabic digits for mushaf-style ayah end marks (UI only — not in DB text). */
-export function toArabicIndic(n: number): string {
-  return String(Math.max(0, Math.floor(n)))
-    .split("")
-    .map((d) => ARABIC_INDIC[Number(d)] ?? d)
-    .join("");
-}
+import { toLatinDigits } from "./digits";
 
 /**
- * Tanzil-style ayah end mark with Western digits (product choice):
+ * Tanzil-style ayah end mark with Latin digits only (product lock):
  * LRM + ornate paren ﴿ + 1..n + ﴾ + RLM
  * (UI only — not part of downloaded uthmani / reference_text).
  */
 export function tanzilAyahEndMark(n: number): string {
-  return `\u200E\uFD3F${Math.max(0, Math.floor(n))}\uFD3E\u200F`;
+  return `\u200E\uFD3F${toLatinDigits(n)}\uFD3E\u200F`;
+}
+
+/** @deprecated Use toLatinDigits — Arabic-Indic digits are not allowed in UI. */
+export function toArabicIndic(n: number): string {
+  return toLatinDigits(n);
 }
 
 export type WordTiming = { i: number; start: number; end: number };

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>رأي خبير مزامنة الكاريوكي — يونس</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Amiri:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4f0ea;
+      --card: #fffcf7;
+      --ink: #1c1917;
+      --mute: #57534e;
+      --line: #e7e0d5;
+      --sage: #2f6b4f;
+      --gold: #c4a35a;
+      --warn: #9a3412;
+      --ok: #146c3a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans Arabic", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.65;
+      padding: 1.5rem 1rem 3rem;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; }
+    header.hero {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.35rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--sage);
+      margin: 0 0 0.35rem;
+    }
+    h1 {
+      font-family: Amiri, serif;
+      font-size: 1.7rem;
+      margin: 0 0 0.5rem;
+      line-height: 1.35;
+    }
+    .meta { color: var(--mute); font-size: 0.88rem; margin: 0; }
+    .verdict {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      background: #e7f2eb;
+      border: 1px solid #b7d4c4;
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+    }
+    .verdict strong { color: var(--sage); }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.15rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    h2 {
+      font-size: 1.05rem;
+      margin: 0 0 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+    h3 { font-size: 0.92rem; margin: 1rem 0 0.4rem; color: var(--sage); }
+    p, li { font-size: 0.92rem; color: #292524; }
+    ul, ol { padding-inline-start: 1.2rem; margin: 0.4rem 0; }
+    li { margin: 0.35rem 0; }
+    .score {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.35rem 0.75rem;
+      font-size: 0.88rem;
+      margin: 0.5rem 0 0;
+    }
+    .score span:nth-child(even) {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .good { color: var(--ok); }
+    .mid { color: #a16207; }
+    .bad { color: var(--warn); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      margin-top: 0.5rem;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.5rem 0.55rem;
+      text-align: right;
+      vertical-align: top;
+    }
+    th { background: #f0ebe3; font-weight: 600; }
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.12rem 0.45rem;
+      border-radius: 999px;
+      background: #e7f2eb;
+      color: var(--sage);
+    }
+    .tag.warn { background: #ffedd5; color: var(--warn); }
+    .tag.mid { background: #fef3c7; color: #92400e; }
+    .mono {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.8rem;
+      direction: ltr;
+      text-align: left;
+      background: #f5f1ea;
+      padding: 0.65rem 0.75rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    footer {
+      color: var(--mute);
+      font-size: 0.8rem;
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">استشارة خبير — مزامنة كاريوكي الاستماع · Virtual Kuttab</p>
+      <h1>كيف نزامن تمييز الكلمات مع صوت الحصري المعلّم؟</h1>
+      <p class="meta">
+        نطاق التجربة: سورة <strong>يونس</strong> فقط (109 آيات) · لا توسّع لباقي المصحف قبل نجاح القياس<br />
+        الخبير: مهندس مزامنة صوت/نص (forced alignment + Quran karaoke) · 2026-10-29
+      </p>
+      <div class="verdict">
+        <strong>الحكم:</strong>
+        أسلوبنا الحالي (توزيع الكلمات بنسبة الطاقة/طول الجزر الصوتية) <em>لا يكفي</em> لمزامنة كلمة-بكلمة مع معلّم.
+        المشكلة ليست «bug UI» فقط — بل أن <strong>مصدر التوقيت نفسه تقريبي</strong>.
+        الحل الصحيح ليونس: <strong>محاذاة إجبارية (forced alignment) على نص الآية المثبت</strong>، مع فجوات صمت حقيقية وإعادة التكرار كـ replay، ثم قياس خطأ بالميلي ثانية على عيّنة يدوية قبل تعميم السورة.
+      </div>
+    </header>
+
+    <section>
+      <h2>1) ما الذي يشتكي منه المنتج فعلياً؟</h2>
+      <ul>
+        <li><strong>تأخير ظاهر:</strong> التمييز يأتي بعد كلمة الشيخ (أحياناً بوضوح، أحياناً بعشرات–مئات الملّي ثانية).</li>
+        <li><strong>تأخر دائم خفيف:</strong>«ميكرونات» خلف الصوت — إحساس أن التمييز يلحق ولا يقود.</li>
+        <li><strong>صمت المعلّم:</strong> الشيخ يتوقف للتعليم، والتمييز كان يمشي أو يعلّق على كلمة خطأ (عولج جزئياً بفجوات، لكن التزامن داخل الكلام ما زال ضعيفاً).</li>
+      </ul>
+      <p>
+        هذه أعراض مختلفة لسبب واحد جذري: <strong>لا نملك بداية/نهاية حقيقية لكل كلمة في الملف</strong> —
+        نحن <em>نخمن</em> أين تقع الكلمات داخل جزر الكلام.
+      </p>
+    </section>
+
+    <section>
+      <h2>2) تشخيص النظام الحالي (Virtual Kuttab)</h2>
+      <h3>ما نفعله اليوم</h3>
+      <ol>
+        <li>كشف جزر كلام بطاقة RMS (+ تقسيم على فترات هدوء نسبية).</li>
+        <li>اكتشاف تكرار معلّم (جزر متشابهة المدة) → <span class="mono">replays</span>.</li>
+        <li>توزيع كلمات نص الآية <em>نسبياً</em> على الجزر حسب الوزن (طول الكلمة حرفياً) — غالباً بدون ASR timestamps دقيقة لكل كلمة.</li>
+        <li>الواجهة: <span class="mono">audio.currentTime</span> → اختيار الكلمة النشطة (+ lead ثابت ~80ms).</li>
+      </ol>
+
+      <h3>تقييم الخبير</h3>
+      <div class="score">
+        <span>دقة حدود الكلمة داخل الآية</span><span class="bad">2 / 10</span>
+        <span>التعامل مع صمت المعلّم</span><span class="mid">6 / 10</span>
+        <span>التعامل مع إعادة العبارة</span><span class="mid">5 / 10</span>
+        <span>ثبات الإحساس (±50ms)</span><span class="bad">2 / 10</span>
+        <span>قابلية القياس / QA</span><span class="bad">1 / 10</span>
+      </div>
+
+      <h3>لماذا يظهر التأخير؟</h3>
+      <ul>
+        <li><strong>التوزيع النسبي ≠ محاذاة:</strong> كلمة قصيرة صوتياً قد تأخذ وقتاً طويلاً في التوقيت إن كان وزن الحروف كبيراً أو العكس — فينزاح التمييز عن الصوت عشرات–مئات ms.</li>
+        <li><strong>المدّ والتجويد:</strong> معلّم يطيل حركات؛ الوزن الحرفي لا يمثل زمن النطق الحقيقي (أبحاث محاذاة القرآن تؤكد أن المدّ يكسر forced alignment الكلاسيكي إن لم يُنمذج).</li>
+        <li><strong>Lead ثابت 80ms:</strong> يعالج الإحساس بالتأخر أحياناً ويُبكّر أحياناً — ليس تعويضاً عن خطأ المحاذاة.</li>
+        <li><strong>RAF + currentTime:</strong> تأخير رسم الإطار (~8–16ms) مقبول؛ ليس سبب «التأخر الملحوظ». المشكلة في بيانات التوقيت.</li>
+        <li><strong>طاقة RMS:</strong> تُجيد فصل الصمت الطويل؛ لا تعرف <em>أي</em> كلمة تُقال داخل الجزيرة.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3) ماذا يفعل المحترفون في هذا المجال؟</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>النهج</th>
+            <th>الفكرة</th>
+            <th>ملاءمة المعلّم</th>
+            <th>ملاحظة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>A. Forced alignment</strong><br />(HMM/DNN + نص معروف)</td>
+            <td>الصوت + نص الآية الثابت → بداية/نهاية كل كلمة</td>
+            <td><span class="tag">الأفضل لـ v1</span></td>
+            <td>المعيار الصناعي للكاريوكي عندما النص معروف مسبقاً (حالتنا تماماً)</td>
+          </tr>
+          <tr>
+            <td><strong>B. DTW من مراجع موقّتة</strong><br />(مثل tadabur-align)</td>
+            <td>مطابقة التسجيل بمراجع لها توقيتات، ثم نقل الحدود + درجة ثقة</td>
+            <td><span class="tag mid">ممتاز إن توفرت مراجع</span></td>
+            <td>قوي لأي قارئ؛ يحتاج مجموعة مراجع موقّتة — للمعلّم قد لا توجد بعد</td>
+          </tr>
+          <tr>
+            <td><strong>C. ASR timestamps فقط</strong><br />(quran-asr-tiny)</td>
+            <td>نموذج يتعرّف ويخرج أزمنة الرموز</td>
+            <td><span class="tag mid">مكمّل لا أساس</span></td>
+            <td>لدينا المحرك؛ لكن بدون محاذاة للنص المثبت ينحرف أو يختصر عند التكرار</td>
+          </tr>
+          <tr>
+            <td><strong>D. طاقة / جزر فقط</strong><br />(وضعنا الحالي)</td>
+            <td>تقسيم صمت ثم توزيع نسبي</td>
+            <td><span class="tag warn">غير كافٍ</span></td>
+            <td>جيد للصمت؛ فاشل لدقة الكلمة</td>
+          </tr>
+          <tr>
+            <td><strong>E. تصحيح يدوي (QUL)</strong></td>
+            <td>مراجعة بشرية لحدود الكلمات</td>
+            <td><span class="tag">ذهبي للتحقق</span></td>
+            <td>لا يُستخدم لتوليد 6236؛ يُستخدم لعيّنة QA على يونس</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        مصادر مرجعية في المجال: أدوات QUL للـ timestamps، محاذاة قرآن Forced Alignment مع نمذجة المدّ (أبحاث IEEE Access 2024)،
+        مكتبات مثل Munajjam (صمت + تشابه نصي)، وDTW-transfer (tadabur-align) للكاريوكي عبر المراجع.
+      </p>
+    </section>
+
+    <section>
+      <h2>4) التوصية الملزمة — تجربة سورة يونس فقط</h2>
+      <p><span class="tag">القرار المقترح</span> مسار <strong>A′</strong> مضبوط للمعلّم:</p>
+      <ol>
+        <li>
+          <strong>مرحلة صوتية:</strong> اكتشاف جزر كلام + فجوات صمت (≥ ~0.7–0.9s) + تكرارات → نفس فكرة <span class="mono">replays</span> الحالية (نحافظ عليها).
+        </li>
+        <li>
+          <strong>مرحلة محاذاة:</strong> لكل جزيرة «مرور أول» فقط، شغّل
+          <strong>forced alignment</strong> بين عيّنة الصوت ونص الكلمات المتوقع في تلك الجزيرة
+          (نص الآية الكامل إذا الجزيرة = مرور كامل؛ أو مقطع العبارة إن قسّمنا لاحقاً).
+        </li>
+        <li>
+          <strong>محرك عملي لـ VK:</strong> ابدأ بما لدينا —
+          <span class="mono">sherpa-onnx</span> + <span class="mono">quran-asr-tiny</span>
+          لكن في وضع <em>محاذاة للنص المثبت</em> (أو CTC forced-align / Viterbi على الرموز)،
+          لا «توزيع نسبي». إن فشل على آية: علّمها <span class="mono">needs_review</span>.
+        </li>
+        <li>
+          <strong>واجهة:</strong>
+          <ul>
+            <li>لا lead ثابت أعمى — عوّض بـ <span class="mono">calibration_ms</span> قابل للضبط من القياس (هدف: متوسط خطأ ≈ 0 ± 40ms).</li>
+            <li>أثناء الفجوة: لا تمييز نشط (كما بدأنا).</li>
+            <li>أثناء replay: أعد ربط الزمن كما هو اليوم.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>QA على يونس قبل أي سورة أخرى:</strong>
+          عيّنة يدوية 12–15 آية (قصيرة / متوسطة / طويلة / ذات تكرار)،
+          قياس لكل كلمة: <span class="mono">error_ms = t_highlight_start − t_speech_onset</span>.
+          نجاح التجربة إذا:
+          <ul>
+            <li>وسيط |error| ≤ 80ms على ≥ 85% من الكلمات في العيّنة</li>
+            <li>صفر «مشي تمييز أثناء صمت معلّم واضح ≥ 1s»</li>
+            <li>التكرارات تعيد تمييز نفس الكلمات لا كلمات لاحقة</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>ماذا لا نفعل الآن</h3>
+      <ul>
+        <li>لا نعيد توليد المصحف كاملاً بأسلوب الطاقة النسبي مرّة أخرى على أمل «سحر المعايرة».</li>
+        <li>لا نعتمد DTW من مراجع قبل أن نثبّت forced-align على المعلّم (مراجع موقّتة للمعلّم نادرة).</li>
+        <li>لا نخلط إصلاح UI مع إصلاح مصدر التوقيت في نفس التجربة بدون قياس.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5) خطة تنفيذ التجربة (يونس فقط)</h2>
+      <table>
+        <thead>
+          <tr><th>الخطوة</th><th>المخرج</th><th>قبول</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1. Prototype aligner لآية واحدة (مثلاً 10:1 ثم 10:2)</td>
+            <td>JSON كلمات بـ start/end من محاذاة حقيقية + رسم مقارنة مع الطاقة</td>
+            <td>استماع يدوي: التمييز «يلتصق» بالصوت</td>
+          </tr>
+          <tr>
+            <td>2. سكربت توليد يونس 1–109 بالمحاذاة الجديدة</td>
+            <td>تحديث <span class="mono">ayah_audio.timings_json</span> لـ surah=10 فقط</td>
+            <td>كل آية: عدد كلمات = نص عثماني</td>
+          </tr>
+          <tr>
+            <td>3. لوحة قياس (offline)</td>
+            <td>تقرير median/p90 لـ |error_ms| على 12 آية معلَّمة يدوياً</td>
+            <td>عتبات القسم 4</td>
+          </tr>
+          <tr>
+            <td>4. ضبط calibration_ms في الواجهة إن لزم</td>
+            <td>ثابت واحد ليونس أو لكل آية إن تفاوت</td>
+            <td>تحسّن الوسيط دون كسر الصمت</td>
+          </tr>
+          <tr>
+            <td>5. قرار go / no-go</td>
+            <td>تعميم لسورة ثانية أو إعادة تصميم المحاذاة</td>
+            <td>موافقة المنتج بعد تجربة حية</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>6) خيارات تقنية للمحاذاة (مرتّبة لـ VK)</h2>
+      <ol>
+        <li>
+          <strong>الخيار المفضّل للتجربة:</strong>
+          CTC/attention forced alignment باستخدام نفس نموذج
+          <span class="mono">quran-asr-tiny</span> على مقاطع المرور الأول فقط
+          (نص مرجعي = كلمات الآية؛ لا نسمح باختراع كلمات).
+        </li>
+        <li>
+          <strong>بديل قوي:</strong>
+          Montreal Forced Aligner / HMM عربي مع قاموس نطق قرآن — أدق للمدّ، تكلفة إعداد أعلى.
+        </li>
+        <li>
+          <strong>بديل لاحق:</strong>
+          DTW من مراجع موقّتة إن بنينا «ذهبياً» صغيراً ليونس يدوياً ثم نقلناه.
+        </li>
+      </ol>
+      <p>
+        طالما النص معروف 100% (Tanzil)، <strong>forced alignment هو الحل الصحيح علمياً وهندسياً</strong>
+        لكاريوكي الاستماع — الطاقة تبقى فقط لكشف الصمت والتكرار.
+      </p>
+    </section>
+
+    <section>
+      <h2>7) خلاصة للقرار</h2>
+      <div class="score">
+        <span>هل نكمل ترقيع توزيع الطاقة؟</span><span class="bad">لا</span>
+        <span>هل المشكلة في السيرفر/الواجهة فقط؟</span><span class="bad">لا — المصدر</span>
+        <span>هل نجرّب يونس أولاً؟</span><span class="good">نعم</span>
+        <span>الحل الحقيقي</span><span class="good">Forced align + صمت + replay</span>
+      </div>
+      <p style="margin-top:1rem">
+        <strong>طلب الموافقة:</strong>
+        اعتمد هذا الرأي كمسار يونس. بعد موافقتك نبني النموذج الأولي على آية–آيتين من يونس،
+        نقيس بالملّي ثانية، ثم نولّد السورة كاملة — دون المساس بباقي المصحف حتى تنجح العتبات.
+      </p>
+    </section>
+
+    <footer>
+      Virtual Kuttab · Expert opinion: karaoke word sync · Husary Muallim · Surah Yunus pilot · 2026-10-29
+    </footer>
+  </div>
+</body>
+</html>

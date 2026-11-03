@@ -1,4 +1,4 @@
-/** Local Hifz progress — ayah-by-ayah continue card (no auth required). */
+/** Hifz progress — local always; cloud when authenticated (Stage 1). */
 
 export type HifzProgress = {
   surah: number;
@@ -23,7 +23,13 @@ export function loadProgress(): HifzProgress | null {
   }
 }
 
-export function saveProgress( partial: {
+/** Write local only (used by sync merge). */
+export function saveProgressLocal(next: HifzProgress): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(KEY, JSON.stringify(next));
+}
+
+export function saveProgress(partial: {
   surah: number;
   ayah: number;
   perfect?: boolean | null;
@@ -38,7 +44,10 @@ export function saveProgress( partial: {
     badCount: partial.badCount ?? prev?.badCount ?? 0,
     updatedAt: new Date().toISOString(),
   };
-  window.localStorage.setItem(KEY, JSON.stringify(next));
+  saveProgressLocal(next);
+  void import("./sync-progress")
+    .then((m) => m.pushProgressIfAuthed(partial))
+    .catch(() => {});
 }
 
 export function lessonHref(surah: number, ayah: number): string {

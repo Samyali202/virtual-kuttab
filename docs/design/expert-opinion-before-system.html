@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>رأي خبير UI/UX — قبل نظام التصميم</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Amiri:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4f0ea;
+      --card: #fffcf7;
+      --ink: #1c1917;
+      --mute: #57534e;
+      --line: #e7e0d5;
+      --sage: #2f6b4f;
+      --gold: #c4a35a;
+      --warn: #9a3412;
+      --ok: #146c3a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans Arabic", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.65;
+      padding: 1.5rem 1rem 3rem;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    header.hero {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.35rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--sage);
+      letter-spacing: 0.02em;
+      margin: 0 0 0.35rem;
+    }
+    h1 {
+      font-family: Amiri, serif;
+      font-size: 1.75rem;
+      margin: 0 0 0.5rem;
+      line-height: 1.35;
+    }
+    .meta { color: var(--mute); font-size: 0.88rem; margin: 0; }
+    .verdict {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      background: #e7f2eb;
+      border: 1px solid #b7d4c4;
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+    }
+    .verdict strong { color: var(--sage); }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.15rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    h2 {
+      font-size: 1.05rem;
+      margin: 0 0 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+    h3 { font-size: 0.92rem; margin: 1rem 0 0.4rem; color: var(--sage); }
+    p, li { font-size: 0.92rem; color: #292524; }
+    ul { padding-inline-start: 1.2rem; margin: 0.4rem 0; }
+    li { margin: 0.35rem 0; }
+    .score {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.35rem 0.75rem;
+      font-size: 0.88rem;
+      margin: 0.5rem 0 0;
+    }
+    .score span:nth-child(even) {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .good { color: var(--ok); }
+    .mid { color: #a16207; }
+    .bad { color: var(--warn); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      margin-top: 0.5rem;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.5rem 0.55rem;
+      text-align: right;
+      vertical-align: top;
+    }
+    th { background: #f5f0e8; font-weight: 600; }
+    .do { border-inline-start: 3px solid var(--sage); padding-inline-start: 0.65rem; margin: 0.6rem 0; }
+    .dont { border-inline-start: 3px solid var(--warn); padding-inline-start: 0.65rem; margin: 0.6rem 0; }
+    .do strong, .dont strong { display: block; font-size: 0.8rem; margin-bottom: 0.15rem; }
+    .pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: #f3e0a8;
+      color: #1c1917;
+      margin-left: 0.25rem;
+    }
+    footer {
+      text-align: center;
+      color: var(--mute);
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    a { color: var(--sage); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">تقرير خبير UI/UX · قبل إنشاء Design System</p>
+      <h1>رأي مستقل عن اتجاه التصميم</h1>
+      <p class="meta">
+        المنتج: الكتّاب الافتراضي · الشاشة: درس استمع/سجّل · المراجع: مفاهيم A/B + الواجهة الحية على
+        <a href="https://masar360.com">masar360.com</a>
+        · المعيار المستهدف: WCAG 2.2 AA
+      </p>
+      <div class="verdict">
+        <strong>الخلاصة:</strong>
+        اعتمدوا اتجاه <span class="pill">A — كُتّاب المصباح</span>
+        كاتجاه بصري، لكن لا تبنوا نظام تصميم من الـ mockup كما هو.
+        الـ mockup جيّد كمزاج (mood)، ضعيف كعقد منتج (product contract).
+        أصلحوا التسلسل الهرمي وحالات الاستخدام أولاً، ثم جمّدوا التوكنات في DESIGN.md.
+      </div>
+    </header>
+
+    <section>
+      <h2>1. من أنا كـ«خبير» في هذا التقرير؟</h2>
+      <p>
+        عدسة مراجعة مزدوجة: <strong>UX للمنتجات التعليمية العربية RTL</strong>
+        + <strong>Design engineering</strong> (وضوح، تباين، حركة، إمكانية وصول).
+        الهدف ليس تزيين الصفحة، بل جعل حلقة
+        <em>استمع → كرّر → سجّل → أحسنت/أعد</em>
+        أهدأ وأوضح للطفل وللبالغ.
+      </p>
+    </section>
+
+    <section>
+      <h2>2. تقييم سريع للواجهة الحالية (الحية)</h2>
+      <div class="score">
+        <span>وضوح المهمة</span><span class="mid">6/10</span>
+        <span>حضور العلامة / الكتّاب</span><span class="bad">3/10</span>
+        <span>بطولة الآية</span><span class="bad">4/10</span>
+        <span>هدوء عاطفي (بدون خجل)</span><span class="mid">5/10</span>
+        <span>جاهزية WCAG</span><span class="bad">3/10</span>
+        <span>تميّز عن «نموذج إداري»</span><span class="bad">2/10</span>
+      </div>
+      <p style="margin-top:0.85rem">
+        الشاشة تعمل وظيفياً، لكنها تبدو كـ form بيج + أزرار خضراء.
+        الآية ليست البطل؛ مشغّل الصوت الأصلي للمتصفح يكسر اللغة البصرية؛
+        ومستويات طفل/مبتدئ/محترف تبدو كفلاتر لوحة تحكم لا كإعداد درس.
+      </p>
+    </section>
+
+    <section>
+      <h2>3. رأي في المفهومين A و B</h2>
+      <h3>A — كُتّاب المصباح <span class="pill">موصى به</span></h3>
+      <p>
+        المزاج صحيح للمنتج: دفء، احترام، إحساس غرفة تعلّم لا تطبيق SaaS.
+        تمييز الكلمة النشطة بـ«مصباح» ذهبي أوضح للأطفال من تسطير رفيع.
+        ألوان sage / ورق / حبر تبتعد عن بنفسج الـ AI الافتراضي.
+      </p>
+      <div class="score">
+        <span>ملاءمة الجمهور (طفل+بالغ)</span><span class="good">9/10</span>
+        <span>ملاءمة معلّم الحصري</span><span class="good">9/10</span>
+        <span>خطر «زيادة زخرفة»</span><span class="mid">6/10</span>
+      </div>
+
+      <h3>B — المصحف الحديث</h3>
+      <p>
+        أنظف وأكثر «جدية»، مناسب لبالغ محترف، لكن قد يبدو بارداً للطفل
+        ويُضعف إحساس الكتّاب. التسطير التركواز أنيق لكنه أضعف كإشارة كاريوكي أثناء الوقفات.
+      </p>
+      <div class="score">
+        <span>أناقة بصرية</span><span class="good">8/10</span>
+        <span>دفء تعليمي</span><span class="mid">5/10</span>
+        <span>وضوح الكلمة النشطة على الموبايل</span><span class="mid">6/10</span>
+      </div>
+
+      <p><strong>قرار الخبير:</strong> ابنوا على <strong>A</strong>. إن رغبتم لاحقاً، اقتبسوا من B فقط: شرائح السورة الأنظف وحدود أهدأ — لا تستبدلوا المصباح بالتسطير فقط.</p>
+    </section>
+
+    <section>
+      <h2>4. ملاحظات نقدية على mockup A (قبل التوكنات)</h2>
+      <table>
+        <thead>
+          <tr><th>الملاحظة</th><th>لماذا تهم</th><th>توجيه قبل الـ Design System</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>هالة ذهبية حول الكلمة قد تُضعف التباين</td>
+            <td>WCAG + قراءة عربية كثيفة التشكيل</td>
+            <td>خلفيات ناعمة + تباين نص ≥ 4.5:1؛ لا تعتمد على الـ glow وحده</td>
+          </tr>
+          <tr>
+            <td>الأخضر/الأحمر معاً على نفس السطر</td>
+            <td>قد يبدو «تصحيحاً قاسياً» للطفل</td>
+            <td>حدّوا الأخطاء الظاهرة (1–2) كما في قرار المنتج؛ رسالة هادئة</td>
+          </tr>
+          <tr>
+            <td>الشريط السفلي جيد</td>
+            <td>الموبايل يحتاج إبهاماً ثابتاً</td>
+            <td>ثبّتوا Listen/Record كـ dock؛ أهداف لمس ≥ 44×44px للأطفال</td>
+          </tr>
+          <tr>
+            <td>لا حالة «أحسنت» ولا تسجيل</td>
+            <td>الحلقة ناقصة عاطفياً</td>
+            <td>عرّفوا states قبل التوكنات: idle / listening / recording / scoring / success / retry</td>
+          </tr>
+          <tr>
+            <td>مشغّل الصوت غير ظاهر في الـ mock</td>
+            <td>الصوت هو نصف المنتج</td>
+            <td>صمّموا شريط تقدّم خاصاً بدل &lt;audio controls&gt; الأصلي</td>
+          </tr>
+          <tr>
+            <td>الملمس الورقي خفيف</td>
+            <td>جيد — لا تفرطوا</td>
+            <td>تدرّج خفيف فقط؛ لا texture ثقيل يضر الأداء والاستدامة</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>5. إرشادات مُلزمة قبل أي Design System</h2>
+      <div class="do">
+        <strong>افعلوا</strong>
+        الآية أولاً (أكبر عنصر) · RTL حقيقي · مستوى الحساسية قريب من الآية لا فوق الهوية ·
+        كلمة نشطة = إشارة واحدةاضحة · حركة قصيرة فقط (ضغط زر، انتقال كلمة) ·
+        live region لنتيجة التصحيح · تباين مدروس على الورق الدافئ.
+      </div>
+      <div class="dont">
+        <strong>لا تفعلوا</strong>
+        بطاقات داخل بطاقات · بنفسج متدرّج · Glass / Neumorphism على الآية ·
+        شارات تجويد · 3D · Confetti صاخب · إخفاء الآية خلف تسويق ·
+        الاعتماد على اللون وحده لمعنى الخطأ (أضيفوا نصاً/أيقونة).
+      </div>
+
+      <h3>عقد الشاشة (Product contract)</h3>
+      <ul>
+        <li><strong>الوظيفة:</strong> درس آية واحدة — استماع معلّم ثم تسجيل وتغذية راجعة كلمية.</li>
+        <li><strong>البطل:</strong> نص الآية العثماني.</li>
+        <li><strong>الإجراء الأساسي:</strong> استمع، ثم سجّل.</li>
+        <li><strong>العرض المستهدف:</strong> 390×844 و 1280×800.</li>
+        <li><strong>إمكانية الوصول:</strong> WCAG 2.2 AA (تباين، تركيز ظاهر، لوحة مفاتيح، أهداف لمس، تقليل الحركة).</li>
+      </ul>
+
+      <h3>حالات يجب توثيقها قبل التوكنات</h3>
+      <table>
+        <thead><tr><th>الحالة</th><th>ما يراه المستخدم</th><th>الخطوة التالية</th></tr></thead>
+        <tbody>
+          <tr><td>Loading آية</td><td>هيكل ثابت للآية</td><td>انتظر / غيّر السورة</td></tr>
+          <tr><td>Empty / لا صوت</td><td>رسالة هادئة</td><td>اختر آية أخرى</td></tr>
+          <tr><td>Listening</td><td>كلمة مصباح + تقدّم</td><td>إيقاف اختياري</td></tr>
+          <tr><td>Recording</td><td>نبض واضح + إيقاف</td><td>إيقاف للتصحيح</td></tr>
+          <tr><td>Scoring</td><td>كلمات معلّقة / انتظار</td><td>—</td></tr>
+          <tr><td>Success</td><td>أحسنت</td><td>آية تالية / إعادة استماع</td></tr>
+          <tr><td>Retry</td><td>1–2 كلمات مظللة</td><td>سجّل مجدداً / استمع</td></tr>
+          <tr><td>Mic permission</td><td>شرح عربي</td><td>فتح الإعدادات</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>6. ماذا نأخذ من «ترندات 2026»؟</h2>
+      <ul>
+        <li><strong>نعم:</strong> طباعة جريئة للآية · microinteractions · SVG خفيف · تصميم مستدام (خفيف).</li>
+        <li><strong>بحذر:</strong> الوضع الداكن لاحقاً فقط مع تباين صارم.</li>
+        <li><strong>لا:</strong> 3D، نيون retro، glass على المصحف، neumorphism.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>7. توصية الخطوة التالية (بدون بناء نظام بعد)</h2>
+      <ol>
+        <li>الموافقة على اتجاه <strong>A</strong> مع ملاحظات القسم 4.</li>
+        <li>ثم فقط: توليد <code>DESIGN.md</code> + توكنات (ألوان، خطوط، مسافات، حركة) وفق هذه الإرشادات.</li>
+        <li>ثم تنفيذ واجهة الدرس + فحص WCAG على الموبايل وسطح المكتب.</li>
+      </ol>
+      <p style="margin-bottom:0">
+        <strong>رأي الخبير النهائي:</strong>
+        A هو الاتجاه الصحيح عاطفياً وتربوياً. لا تجمّدوا نظام تصميم قبل تثبيت حالات الحلقة وإشارة الكلمة وإمكانية الوصول.
+        الـ mockup الحالي = بوصلة، لا دستور.
+      </p>
+    </section>
+
+    <footer>
+      ملف رأي فقط — لم يُنشأ Design System بعد ·
+      معاينة A/B:
+      <a href="./concept-ab-mockups.html">concept-ab-mockups.html</a>
+    </footer>
+  </div>
+</body>
+</html>

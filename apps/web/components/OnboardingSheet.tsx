@@ -1,11 +1,15 @@
 "use client";
 
+import { toLatinDigits } from "../lib/digits";
+import { useI18n } from "./I18nProvider";
+
 type Props = {
   open: boolean;
   onDone: () => void;
 };
 
 export function OnboardingSheet({ open, onDone }: Props) {
+  const { t } = useI18n();
   if (!open) return null;
   return (
     <div className="sheet-backdrop" role="presentation">
@@ -16,22 +20,25 @@ export function OnboardingSheet({ open, onDone }: Props) {
         aria-labelledby="onboard-title"
       >
         <h2 id="onboard-title" className="sheet-title">
-          كيف يعمل الكتّاب؟
+          {t("onboarding.title")}
         </h2>
         <ol className="sheet-steps">
           <li>
-            <strong>١</strong> استمع للشيخ الحصري المعلّم
+            <strong className="latin-num">{toLatinDigits(1)}</strong>{" "}
+            {t("onboarding.step1")}
           </li>
           <li>
-            <strong>٢</strong> كرّر بعده
+            <strong className="latin-num">{toLatinDigits(2)}</strong>{" "}
+            {t("onboarding.step2")}
           </li>
           <li>
-            <strong>٣</strong> سجّل من حفظك
+            <strong className="latin-num">{toLatinDigits(3)}</strong>{" "}
+            {t("onboarding.step3")}
           </li>
         </ol>
-        <p className="sheet-note">آية بآية — تغذية راجعة على مستوى الكلمة فقط</p>
+        <p className="sheet-note">{t("onboarding.note")}</p>
         <button type="button" className="sheet-cta" onClick={onDone}>
-          فهمت، ابدأ
+          {t("onboarding.cta")}
         </button>
       </div>
     </div>

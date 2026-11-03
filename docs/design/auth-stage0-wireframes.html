@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Virtual Kuttab — Stage 0 Auth wireframes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Amiri:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vk-paper-0: #f8f1e6;
+      --vk-paper-1: #efe4d2;
+      --vk-surface: #fffcf5;
+      --vk-ink: #1c1917;
+      --vk-ink-mute: #57534e;
+      --vk-line: #ddcfb8;
+      --vk-sage: #2f6b4f;
+      --vk-sage-soft: #e7f2eb;
+      --vk-sage-ink: #1e4d38;
+      --vk-on-sage: #fff;
+      --vk-bad: #8b2e22;
+      --vk-bad-soft: #f8d9d4;
+      --vk-focus: #2f6b4f;
+      --vk-font-ui: "IBM Plex Sans Arabic", Tahoma, sans-serif;
+      --vk-font-brand: Amiri, "Noto Naskh Arabic", serif;
+      --phone-w: 390px;
+      --phone-h: 760px;
+    }
+    html[data-theme="night"] {
+      --vk-paper-0: #121416;
+      --vk-paper-1: #1a1d1f;
+      --vk-surface: #222628;
+      --vk-ink: #f2f0eb;
+      --vk-ink-mute: #a8a29e;
+      --vk-line: #3a3f42;
+      --vk-sage: #52b788;
+      --vk-sage-soft: #1e3d30;
+      --vk-sage-ink: #b7e4c7;
+      --vk-on-sage: #0b120f;
+      --vk-bad: #e8a598;
+      --vk-bad-soft: #3a2220;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--vk-font-ui);
+      background: #d6d3d1;
+      color: var(--vk-ink);
+      min-height: 100vh;
+    }
+    .board {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+    .board-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+    .board-head h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .board-head p {
+      margin: 0.25rem 0 0;
+      color: #44403c;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+    .toggles { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .toggles button {
+      font: inherit;
+      font-weight: 600;
+      min-height: 40px;
+      padding: 0 0.9rem;
+      border-radius: 10px;
+      border: 1px solid #a8a29e;
+      background: #fff;
+      cursor: pointer;
+    }
+    .toggles button.active {
+      background: var(--vk-sage);
+      color: var(--vk-on-sage);
+      border-color: transparent;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--phone-w), 1fr));
+      gap: 1.5rem;
+      justify-items: center;
+    }
+    .phone-wrap { width: var(--phone-w); }
+    .phone-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #44403c;
+      margin: 0 0 0.4rem;
+      letter-spacing: 0.02em;
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 28px;
+      border: 2px solid #57534e;
+      background: linear-gradient(180deg, var(--vk-paper-0), var(--vk-paper-1));
+      color: var(--vk-ink);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+      position: relative;
+    }
+    .notch {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      color: var(--vk-ink-mute);
+      flex-shrink: 0;
+    }
+    .screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0.75rem 1rem 1.25rem;
+      overflow: auto;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .back {
+      width: 44px; height: 44px;
+      border: 1px solid var(--vk-line);
+      border-radius: 10px;
+      background: var(--vk-surface);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .brand {
+      flex: 1;
+      text-align: center;
+      font-family: var(--vk-font-brand);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--vk-sage);
+    }
+    .title {
+      margin: 0 0 0.35rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .sub {
+      margin: 0 0 1rem;
+      font-size: 0.82rem;
+      color: var(--vk-ink-mute);
+      text-align: center;
+      line-height: 1.45;
+    }
+    .field { margin-bottom: 0.75rem; }
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      color: var(--vk-ink-mute);
+    }
+    .field input, .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--vk-line);
+      border-radius: 10px;
+      background: var(--vk-surface);
+      color: var(--vk-ink);
+      font: inherit;
+      padding: 0 0.75rem;
+    }
+    .field .hint {
+      margin: 0.25rem 0 0;
+      font-size: 0.72rem;
+      color: var(--vk-ink-mute);
+    }
+    .field.err input { border-color: color-mix(in srgb, var(--vk-bad) 50%, var(--vk-line)); }
+    .field.err .hint { color: var(--vk-bad); }
+    .seg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+      padding: 0.3rem;
+      border: 1px solid var(--vk-line);
+      border-radius: 12px;
+      background: var(--vk-surface);
+      margin-bottom: 0.9rem;
+    }
+    .seg span {
+      min-height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--vk-ink-mute);
+    }
+    .seg span.on {
+      background: var(--vk-sage-soft);
+      color: var(--vk-sage-ink);
+    }
+    .phone-row {
+      display: grid;
+      grid-template-columns: 5.5rem 1fr;
+      gap: 0.4rem;
+    }
+    .cta {
+      margin-top: 0.5rem;
+      min-height: 48px;
+      border: none;
+      border-radius: 12px;
+      background: var(--vk-sage);
+      color: var(--vk-on-sage);
+      font: inherit;
+      font-weight: 700;
+      width: 100%;
+      display: grid;
+      place-items: center;
+    }
+    .links {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .links a { color: var(--vk-sage); text-decoration: none; }
+    .guest-btn {
+      margin-top: 0.85rem;
+      width: 100%;
+      min-height: 48px;
+      border-radius: 12px;
+      border: 1.5px solid var(--vk-ink-mute);
+      background: color-mix(in srgb, var(--vk-ink-mute) 10%, var(--vk-surface));
+      color: var(--vk-ink);
+      font: inherit;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+    html[data-theme="night"] .guest-btn {
+      border-color: color-mix(in srgb, var(--vk-ink-mute) 70%, var(--vk-line));
+      background: color-mix(in srgb, var(--vk-ink-mute) 16%, var(--vk-surface));
+      color: var(--vk-ink);
+    }
+    .merge {
+      margin: 0 0 0.75rem;
+      padding: 0.55rem 0.7rem;
+      border-radius: 10px;
+      background: var(--vk-sage-soft);
+      color: var(--vk-sage-ink);
+      font-size: 0.75rem;
+      line-height: 1.4;
+      text-align: center;
+    }
+    .ok-panel {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--vk-line);
+      background: var(--vk-surface);
+      text-align: center;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    /* Home entry mock */
+    .home-kicker {
+      font-family: var(--vk-font-brand);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--vk-sage);
+      text-align: center;
+      margin: 0.25rem 0 0.75rem;
+    }
+    .toolbar {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .chip {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 0.65rem;
+      border: 1px solid var(--vk-line);
+      border-radius: 10px;
+      background: var(--vk-surface);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .chip.account {
+      border-color: color-mix(in srgb, var(--vk-sage) 45%, var(--vk-line));
+      color: var(--vk-sage-ink);
+      max-width: 7.5rem;
+      padding-inline: 0.55rem;
+    }
+    .chip.account .chip-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .home-title { text-align: center; font-weight: 700; margin: 0; }
+    .home-sub { text-align: center; color: var(--vk-ink-mute); font-size: 0.8rem; margin: 0.4rem 0 1rem; }
+    .continue {
+      display: block;
+      padding: 1rem;
+      border-radius: 12px;
+      background: var(--vk-sage);
+      color: var(--vk-on-sage);
+      text-align: center;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+    }
+    .secondary {
+      display: block;
+      padding: 0.85rem;
+      border-radius: 12px;
+      border: 1px solid var(--vk-line);
+      background: var(--vk-surface);
+      color: var(--vk-sage);
+      text-align: center;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .note {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #292524;
+    }
+    .note code { font-size: 0.8em; }
+  </style>
+</head>
+<body>
+  <div class="board">
+    <div class="board-head">
+      <div>
+        <h1>Stage 0 — Auth wireframes</h1>
+        <p>كُتّاب المصباح tokens · 390×844 · guest never blocked · approve before coding</p>
+      </div>
+      <div class="toggles">
+        <button type="button" id="themeCream" class="active">فاتح</button>
+        <button type="button" id="themeNight">ليلي</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- A0 Home entry -->
+      <div class="phone-wrap">
+        <p class="phone-label">A0 — Home entry (logged out)</p>
+        <div class="phone">
+          <div class="notch">12:30</div>
+          <div class="screen">
+            <p class="home-kicker">الكُتَّاب أون لاين</p>
+            <div class="toolbar">
+              <span class="chip" title="theme">☀</span>
+              <span class="chip" title="mic">🎤</span>
+              <span class="chip">العربية</span>
+              <span class="chip" title="settings">⚙</span>
+              <span class="chip account">حساب</span>
+            </div>
+            <p class="home-title">حفظ آية بآية</p>
+            <p class="home-sub">استمع · كرّر · سجّل — الضيف يعمل بدون حساب</p>
+            <a class="continue" href="#">متابعة الحفظ</a>
+            <a class="secondary" href="#">ابدأ حفظاً جديداً</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- A1 Login -->
+      <div class="phone-wrap">
+        <p class="phone-label">A1 — /login</p>
+        <div class="phone">
+          <div class="notch">12:30</div>
+          <div class="screen">
+            <div class="top">
+              <div class="back">→</div>
+              <div class="brand">الكُتَّاب أون لاين</div>
+              <div style="width:44px"></div>
+            </div>
+            <h2 class="title">دخول</h2>
+            <p class="sub">البريد أو اسم المستخدم + كلمة المرور</p>
+            <div class="field">
+              <label>البريد أو اسم المستخدم</label>
+              <input value="ahmad_quran" readonly />
+            </div>
+            <div class="field">
+              <label>كلمة المرور</label>
+              <input type="password" value="••••••••" readonly />
+            </div>
+            <div class="cta">دخول</div>
+            <div class="links">
+              <a href="#">نسيت كلمة المرور؟</a>
+              <a href="#">إنشاء حساب</a>
+            </div>
+            <a class="guest-btn" href="#">متابعة دون تسجيل</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- A2 Register -->
+      <div class="phone-wrap">
+        <p class="phone-label">A2 — /register</p>
+        <div class="phone">
+          <div class="notch">12:30</div>
+          <div class="screen">
+            <div class="top">
+              <div class="back">→</div>
+              <div class="brand">الكُتَّاب أون لاين</div>
+              <div style="width:44px"></div>
+            </div>
+            <h2 class="title">إنشاء حساب</h2>
+            <p class="sub">لحفظ تقدّمك على أي جهاز</p>
+            <div class="merge">تقدّم الضيف على هذا الجهاز سيُدمج في حسابك بعد التسجيل</div>
+            <div class="seg">
+              <span class="on">طالب</span>
+              <span>ولي أمر</span>
+            </div>
+            <div class="field">
+              <label>الاسم</label>
+              <input placeholder="أحمد" readonly />
+            </div>
+            <div class="field">
+              <label>اسم المستخدم (فريد)</label>
+              <input value="ahmad_quran" readonly />
+              <p class="hint">لاتيني صغير وأرقام و _ · 3–24</p>
+            </div>
+            <div class="field">
+              <label>الجوال (بدون رسائل SMS)</label>
+              <div class="phone-row">
+                <select disabled><option>+966</option></select>
+                <input value="5xxxxxxx" readonly />
+              </div>
+            </div>
+            <div class="field">
+              <label>العمر (اختياري)</label>
+              <input inputmode="numeric" placeholder="—" readonly />
+            </div>
+            <div class="field">
+              <label>البريد</label>
+              <input type="email" placeholder="name@email.com" readonly />
+            </div>
+            <div class="field">
+              <label>كلمة المرور</label>
+              <input type="password" value="••••••••" readonly />
+            </div>
+            <div class="cta">إنشاء حساب</div>
+            <div class="links">
+              <a href="#">لديك حساب؟ دخول</a>
+            </div>
+            <a class="guest-btn" href="#">متابعة دون تسجيل</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- A3 Forgot -->
+      <div class="phone-wrap">
+        <p class="phone-label">A3 — /forgot-password</p>
+        <div class="phone">
+          <div class="notch">12:30</div>
+          <div class="screen">
+            <div class="top">
+              <div class="back">→</div>
+              <div class="brand">الكُتَّاب أون لاين</div>
+              <div style="width:44px"></div>
+            </div>
+            <h2 class="title">استعادة كلمة المرور</h2>
+            <p class="sub">نرسل رابط الإعادة إلى بريدك فقط — لا رسائل SMS</p>
+            <div class="field">
+              <label>البريد</label>
+              <input type="email" placeholder="name@email.com" readonly />
+            </div>
+            <div class="cta">إرسال الرابط</div>
+            <div class="ok-panel">بعد الإرسال: تحقّق من بريدك ثم افتح الرابط لتعيين كلمة مرور جديدة.</div>
+            <div class="links">
+              <a href="#">العودة لتسجيل الدخول</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- A4 Reset -->
+      <div class="phone-wrap">
+        <p class="phone-label">A4 — /reset-password</p>
+        <div class="phone">
+          <div class="notch">12:30</div>
+          <div class="screen">
+            <div class="top">
+              <div class="back">→</div>
+              <div class="brand">الكُتَّاب أون لاين</div>
+              <div style="width:44px"></div>
+            </div>
+            <h2 class="title">كلمة مرور جديدة</h2>
+            <p class="sub">من رابط البريد</p>
+            <div class="field">
+              <label>كلمة المرور الجديدة</label>
+              <input type="password" value="••••••••" readonly />
+            </div>
+            <div class="field">
+              <label>تأكيد كلمة المرور</label>
+              <input type="password" value="••••••••" readonly />
+            </div>
+            <div class="cta">حفظ كلمة المرور</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- A5 Logged in -->
+      <div class="phone-wrap">
+        <p class="phone-label">A5 — Home entry (logged in)</p>
+        <div class="phone">
+          <div class="notch">12:30</div>
+          <div class="screen">
+            <p class="home-kicker">الكُتَّاب أون لاين</p>
+            <div class="toolbar">
+              <span class="chip">☀</span>
+              <span class="chip">العربية</span>
+              <span class="chip">⚙</span>
+              <span class="chip account" title="أحمد محمد">
+                <span class="chip-name">أحمد محمد</span>
+              </span>
+            </div>
+            <p class="home-title">حفظ آية بآية</p>
+            <p class="home-sub">تقدّمك محفوظ على السحابة · أي جهاز</p>
+            <a class="continue" href="#">متابعة الحفظ</a>
+            <a class="secondary" href="#">خروج</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Approval checklist:</strong>
+      soft «حساب» entry · login = email/username + password · register collects unique username + E.164 phone (no SMS) · age optional/non-blocking ·
+      reset via email only · guest = distinct button · roles طالب (Student) / ولي أمر.
+      Spec: <code>docs/design/AUTH-STAGE0-SCREENS.md</code>.
+      Reply in chat: <strong>approve screens</strong> to start Stage 0 development.
+    </div>
+  </div>
+  <script>
+    const root = document.documentElement;
+    const cream = document.getElementById("themeCream");
+    const night = document.getElementById("themeNight");
+    cream.addEventListener("click", () => {
+      root.removeAttribute("data-theme");
+      cream.classList.add("active");
+      night.classList.remove("active");
+    });
+    night.addEventListener("click", () => {
+      root.setAttribute("data-theme", "night");
+      night.classList.add("active");
+      cream.classList.remove("active");
+    });
+  </script>
+</body>
+</html>

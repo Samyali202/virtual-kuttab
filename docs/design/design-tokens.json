@@ -1,0 +1,94 @@
+{
+  "$schema_comment": "Virtual Kuttab design tokens — Concept A Kuttab Lamp. See DESIGN.md.",
+  "meta": {
+    "name": "virtual-kuttab",
+    "version": "1.0.0",
+    "direction": "kuttab-lamp",
+    "locked": "2026-10-28",
+    "rtl": true,
+    "wcag": "2.2 AA",
+    "viewports": ["390x844", "1280x800"]
+  },
+  "color": {
+    "paper-0": "#f8f1e6",
+    "paper-1": "#efe4d2",
+    "paper-glow": "#fff6e4",
+    "surface": "#fffcf5",
+    "ink": "#1c1917",
+    "ink-mute": "#57534e",
+    "line": "#ddcfb8",
+    "sage": "#2f6b4f",
+    "sage-soft": "#e7f2eb",
+    "sage-ink": "#1e4d38",
+    "lamp": "#f3e0a8",
+    "lamp-ring": "#c4a35a",
+    "ok": "#146c3a",
+    "ok-soft": "#d8f0e0",
+    "bad": "#8b2e22",
+    "bad-soft": "#f8d9d4",
+    "focus": "#2f6b4f",
+    "on-sage": "#ffffff"
+  },
+  "typography": {
+    "font-ayah": "Amiri, \"Noto Naskh Arabic\", \"Traditional Arabic\", serif",
+    "font-ui": "\"IBM Plex Sans Arabic\", Tahoma, sans-serif",
+    "ayah-size": "clamp(1.45rem, 4.2vw, 1.85rem)",
+    "ayah-line-height": 2.2,
+    "ui-size": "0.95rem",
+    "meta-size": "0.75rem",
+    "brand-size": "1.1rem",
+    "brand-weight": 700
+  },
+  "space": {
+    "1": 4,
+    "2": 8,
+    "3": 12,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "unit": "px"
+  },
+  "radius": {
+    "word": "6px",
+    "chip": "8px",
+    "btn": "12px",
+    "dock": "0"
+  },
+  "touch": {
+    "min": "44px"
+  },
+  "motion": {
+    "ease": "cubic-bezier(0.22, 1, 0.36, 1)",
+    "dur-fast": "120ms",
+    "dur-med": "220ms",
+    "respect-reduced-motion": true
+  },
+  "elevation": {
+    "dock": "0 -8px 24px rgba(28, 25, 23, 0.06)",
+    "lamp-glow": "0 0 0 1px #c4a35a, 0 0 18px rgba(196, 163, 90, 0.35)"
+  },
+  "states": [
+    "loading_ayah",
+    "empty_audio",
+    "idle",
+    "listening",
+    "recording",
+    "scoring",
+    "success",
+    "retry",
+    "mic_denied"
+  ],
+  "wordClasses": {
+    "default": {},
+    "word-active": { "bg": "lamp", "fg": "ink", "ring": "lamp-ring" },
+    "word-ok": { "bg": "ok-soft", "fg": "ok" },
+    "word-bad": { "bg": "bad-soft", "fg": "bad", "nonColorCue": "underline-or-status-text" }
+  },
+  "constraints": {
+    "maxVisibleWordErrors": 2,
+    "audioChrome": "custom-only",
+    "qari": "husary-muallim-only",
+    "tajweedUi": false,
+    "darkModeV1": false
+  }
+}

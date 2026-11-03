@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Virtual Kuttab — A vs B (قبل DESIGN.md)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --page: #e8e4df;
+      --ink: #1c1917;
+      --mute: #6b6560;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans Arabic", Tahoma, sans-serif;
+      background: var(--page);
+      color: var(--ink);
+      padding: 1.5rem 1rem 3rem;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    .top {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .top h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+    }
+    .top p {
+      margin: 0;
+      color: var(--mute);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 1.25rem 0 1rem;
+      flex-wrap: wrap;
+    }
+    .tabs button {
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid #c9c2b8;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .tabs button[aria-selected="true"] {
+      background: #1c1917;
+      color: #fff;
+      border-color: #1c1917;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .compare-note {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 720px) {
+      .compare-note { grid-template-columns: 1fr; }
+    }
+    .note {
+      background: #fff;
+      border: 1px solid #d7d0c6;
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: #44403c;
+    }
+    .note strong { color: #1c1917; }
+
+    .stage {
+      display: flex;
+      justify-content: center;
+    }
+    .phone {
+      width: min(100%, 390px);
+      min-height: 720px;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 18px 50px rgba(28, 25, 23, 0.14);
+    }
+    .phone header { padding: 1.25rem 1.2rem 0.5rem; }
+    .brand {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .sub {
+      margin: 0.25rem 0 0;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      opacity: 0.72;
+    }
+    .levels {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0.85rem 1.2rem 0.7rem;
+    }
+    .levels button {
+      flex: 1;
+      border: none;
+      font: inherit;
+      font-size: 0.78rem;
+      padding: 0.45rem 0.2rem;
+      cursor: default;
+    }
+    .pick {
+      display: flex;
+      gap: 0.45rem;
+      padding: 0 1.2rem 0.9rem;
+      font-size: 0.78rem;
+    }
+    .chip { padding: 0.4rem 0.65rem; }
+    .ayah-wrap {
+      flex: 1;
+      padding: 0.75rem 1.2rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .ayah {
+      font-family: Amiri, "Noto Naskh Arabic", serif;
+      font-size: 1.65rem;
+      line-height: 2.2;
+      text-align: center;
+      margin: 0;
+    }
+    .ayah span {
+      display: inline-block;
+      padding: 0.05rem 0.22rem;
+      margin-inline: 0.06rem;
+    }
+    .meta {
+      text-align: center;
+      font-size: 0.75rem;
+      margin: 1rem 0 0;
+      opacity: 0.65;
+    }
+    .dock {
+      padding: 0.95rem 1.2rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .progress {
+      height: 4px;
+      overflow: hidden;
+    }
+    .progress > i {
+      display: block;
+      height: 100%;
+      width: 38%;
+    }
+    .actions { display: flex; gap: 0.5rem; }
+    .actions button {
+      flex: 1;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.8rem;
+      border: none;
+      cursor: default;
+    }
+    .status {
+      margin: 0;
+      text-align: center;
+      font-size: 0.8rem;
+      opacity: 0.75;
+    }
+    .legend {
+      max-width: 390px;
+      margin: 1rem auto 0;
+      font-size: 0.8rem;
+      color: var(--mute);
+      line-height: 1.55;
+    }
+    .legend code {
+      font-family: ui-monospace, monospace;
+      font-size: 0.75rem;
+      background: #fff;
+      padding: 0.05rem 0.3rem;
+      border-radius: 0.25rem;
+    }
+
+    /* ===== A: Kuttab Lamp ===== */
+    .a {
+      background:
+        radial-gradient(120% 70% at 50% -10%, #fff6e4 0%, transparent 50%),
+        linear-gradient(180deg, #f8f1e6 0%, #efe4d2 100%);
+      border: 1px solid #ddcfb8;
+      color: #1c1917;
+    }
+    .a .levels button {
+      background: rgba(255,255,255,0.5);
+      color: #57534e;
+      border: 1px solid #d6c9b4;
+      border-radius: 0.55rem;
+    }
+    .a .levels .on {
+      background: #e7f2eb;
+      color: #1e4d38;
+      border-color: #2f6b4f;
+      font-weight: 700;
+    }
+    .a .chip {
+      background: rgba(255,255,255,0.6);
+      border: 1px solid #d6c9b4;
+      border-radius: 0.5rem;
+    }
+    .a .word-ok {
+      background: #d8f0e0;
+      color: #146c3a;
+      border-radius: 0.35rem;
+    }
+    .a .word-active {
+      background: #f3e0a8;
+      color: #1c1917;
+      border-radius: 0.35rem;
+      box-shadow: 0 0 0 1px #c4a35a, 0 0 18px rgba(196, 163, 90, 0.35);
+    }
+    .a .word-bad {
+      background: #f8d9d4;
+      color: #8b2e22;
+      border-radius: 0.35rem;
+    }
+    .a .dock {
+      background: rgba(255, 252, 245, 0.9);
+      border-top: 1px solid #ddcfb8;
+    }
+    .a .progress {
+      background: #e0d3bc;
+      border-radius: 99px;
+    }
+    .a .progress > i {
+      background: #c4a35a;
+      border-radius: 99px;
+    }
+    .a .btn-primary {
+      background: #2f6b4f;
+      color: #fff;
+      border-radius: 0.8rem;
+    }
+    .a .btn-secondary {
+      background: #fff;
+      color: #2f6b4f;
+      border: 1px solid #2f6b4f !important;
+      border-radius: 0.8rem;
+    }
+
+    /* ===== B: Modern Mushaf ===== */
+    .b {
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      color: #111;
+    }
+    .b header {
+      border-bottom: 1px solid #ececec;
+      padding-bottom: 0.85rem;
+    }
+    .b .levels button {
+      background: transparent;
+      color: #737373;
+      border: 1px solid #e5e5e5;
+      border-radius: 0.2rem;
+    }
+    .b .levels .on {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+      font-weight: 700;
+    }
+    .b .chip {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 0.15rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .b .ayah-wrap {
+      margin-inline: 1.2rem;
+      padding-inline: 0;
+      border-block: 1px solid #ececec;
+    }
+    .b .word-ok {
+      color: #0f766e;
+      background: transparent;
+    }
+    .b .word-active {
+      color: #0f766e;
+      background: transparent;
+      box-shadow: inset 0 -3px 0 #0f766e;
+      border-radius: 0;
+    }
+    .b .word-bad {
+      color: #b91c1c;
+      background: transparent;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+    .b .dock {
+      background: #fff;
+      border-top: 1px solid #ececec;
+    }
+    .b .progress {
+      background: #ececec;
+      height: 2px;
+      border-radius: 0;
+    }
+    .b .progress > i {
+      background: #0f766e;
+      border-radius: 0;
+    }
+    .b .btn-primary {
+      background: #111;
+      color: #fff;
+      border-radius: 0.25rem;
+    }
+    .b .btn-secondary {
+      background: #fff;
+      color: #111;
+      border: 1px solid #111 !important;
+      border-radius: 0.25rem;
+    }
+
+    .both {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    .both.active { display: grid; }
+    @media (max-width: 820px) {
+      .both.active { grid-template-columns: 1fr; }
+    }
+    .both .phone { width: 100%; min-height: 640px; }
+    .col-title {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h1>مفاهيم التصميم قبل DESIGN.md</h1>
+      <p>
+        قارن A و B ثم أخبرنا بالاختيار. لا ملف MD بعد — هذه معاينة فقط.
+      </p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="اختيار العرض">
+      <button type="button" role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">A — كُتّاب المصباح</button>
+      <button type="button" role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">B — المصحف الحديث</button>
+      <button type="button" role="tab" id="tab-both" aria-selected="false" aria-controls="panel-both">جنباً إلى جنب</button>
+    </div>
+
+    <!-- A -->
+    <div class="panel active" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+      <div class="compare-note">
+        <div class="note"><strong>الشعور:</strong> غرفة كتّاب دافئة — ورق، حبر، مصباح ذهبي على الكلمة.</div>
+        <div class="note"><strong>الأنسب لـ:</strong> أطفال + بالغين مبتدئين · هدوء · إحساس معلّم.</div>
+      </div>
+      <div class="stage">
+        <div class="phone a" aria-label="معاينة المفهوم A">
+          <header>
+            <p class="brand">الكتّاب الافتراضي</p>
+            <p class="sub">استمع ← كرّر ← سجّل · حصري معلّم</p>
+          </header>
+          <div class="levels" role="group" aria-label="المستوى">
+            <button type="button">طفل</button>
+            <button type="button" class="on">مبتدئ</button>
+            <button type="button">محترف</button>
+          </div>
+          <div class="pick">
+            <span class="chip">الفاتحة</span>
+            <span class="chip">آية ٢</span>
+          </div>
+          <div class="ayah-wrap">
+            <p class="ayah" lang="ar">
+              <span class="word-ok">ٱلْحَمْدُ</span>
+              <span class="word-ok">لِلَّهِ</span>
+              <span class="word-active">رَبِّ</span>
+              <span class="word-bad">ٱلْعَٰلَمِينَ</span>
+            </p>
+            <p class="meta">أخضر = صحيح · مصباح = الحالي · أحمر خفيف = أعد</p>
+          </div>
+          <div class="dock">
+            <div class="progress" aria-hidden="true"><i></i></div>
+            <div class="actions">
+              <button type="button" class="btn-primary">استمع</button>
+              <button type="button" class="btn-secondary">سجّل</button>
+            </div>
+            <p class="status">أعد الكلمات المحددة بهدوء</p>
+          </div>
+        </div>
+      </div>
+      <p class="legend">
+        ألوان مقترحة: ورق <code>#F8F1E6</code> · حبر <code>#1C1917</code> · Sage <code>#2F6B4F</code> · مصباح <code>#C4A35A</code>
+      </p>
+    </div>
+
+    <!-- B -->
+    <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+      <div class="compare-note">
+        <div class="note"><strong>الشعور:</strong> صفحة مصحف رقمية نظيفة — خطوط رفيعة · بدون بطاقات.</div>
+        <div class="note"><strong>الأنسب لـ:</strong> بالغين · مظهر رسمي · أقل “تطبيق ألعاب”.</div>
+      </div>
+      <div class="stage">
+        <div class="phone b" aria-label="معاينة المفهوم B">
+          <header>
+            <p class="brand">الكتّاب الافتراضي</p>
+            <p class="sub">استمع ← كرّر ← سجّل · كلمات فقط</p>
+          </header>
+          <div class="levels" role="group" aria-label="المستوى">
+            <button type="button">طفل</button>
+            <button type="button" class="on">مبتدئ</button>
+            <button type="button">محترف</button>
+          </div>
+          <div class="pick">
+            <span class="chip">١ · الفاتحة</span>
+            <span class="chip">٢</span>
+          </div>
+          <div class="ayah-wrap">
+            <p class="ayah" lang="ar">
+              <span class="word-ok">ٱلْحَمْدُ</span>
+              <span class="word-ok">لِلَّهِ</span>
+              <span class="word-active">رَبِّ</span>
+              <span class="word-bad">ٱلْعَٰلَمِينَ</span>
+            </p>
+            <p class="meta">تسطير تركواز للحالي · تسطير أحمر للخطأ</p>
+          </div>
+          <div class="dock">
+            <div class="progress" aria-hidden="true"><i></i></div>
+            <div class="actions">
+              <button type="button" class="btn-primary">استمع</button>
+              <button type="button" class="btn-secondary">سجّل</button>
+            </div>
+            <p class="status">أعد الكلمات المحددة بهدوء</p>
+          </div>
+        </div>
+      </div>
+      <p class="legend">
+        ألوان مقترحة: أبيض <code>#FAFAFA</code> · حبر <code>#111111</code> · تركواز <code>#0F766E</code> · خطأ <code>#B91C1C</code>
+      </p>
+    </div>
+
+    <!-- Both -->
+    <div class="panel both" id="panel-both" role="tabpanel" aria-labelledby="tab-both" hidden>
+      <div>
+        <p class="col-title">A — كُتّاب المصباح</p>
+        <div class="phone a">
+          <header>
+            <p class="brand">الكتّاب الافتراضي</p>
+            <p class="sub">استمع ← كرّر ← سجّل</p>
+          </header>
+          <div class="levels">
+            <button type="button">طفل</button>
+            <button type="button" class="on">مبتدئ</button>
+            <button type="button">محترف</button>
+          </div>
+          <div class="pick">
+            <span class="chip">الفاتحة</span>
+            <span class="chip">٢</span>
+          </div>
+          <div class="ayah-wrap">
+            <p class="ayah" lang="ar">
+              <span class="word-ok">ٱلْحَمْدُ</span>
+              <span class="word-active">رَبِّ</span>
+              <span>ٱلْعَٰلَمِينَ</span>
+            </p>
+          </div>
+          <div class="dock">
+            <div class="progress"><i></i></div>
+            <div class="actions">
+              <button type="button" class="btn-primary">استمع</button>
+              <button type="button" class="btn-secondary">سجّل</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="col-title">B — المصحف الحديث</p>
+        <div class="phone b">
+          <header>
+            <p class="brand">الكتّاب الافتراضي</p>
+            <p class="sub">استمع ← كرّر ← سجّل</p>
+          </header>
+          <div class="levels">
+            <button type="button">طفل</button>
+            <button type="button" class="on">مبتدئ</button>
+            <button type="button">محترف</button>
+          </div>
+          <div class="pick">
+            <span class="chip">١ · الفاتحة</span>
+            <span class="chip">٢</span>
+          </div>
+          <div class="ayah-wrap">
+            <p class="ayah" lang="ar">
+              <span class="word-ok">ٱلْحَمْدُ</span>
+              <span class="word-active">رَبِّ</span>
+              <span>ٱلْعَٰلَمِينَ</span>
+            </p>
+          </div>
+          <div class="dock">
+            <div class="progress"><i></i></div>
+            <div class="actions">
+              <button type="button" class="btn-primary">استمع</button>
+              <button type="button" class="btn-secondary">سجّل</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tabs = [
+      ["tab-a", "panel-a"],
+      ["tab-b", "panel-b"],
+      ["tab-both", "panel-both"],
+    ];
+    function show(id) {
+      tabs.forEach(([tabId, panelId]) => {
+        const on = panelId === id;
+        const tab = document.getElementById(tabId);
+        const panel = document.getElementById(panelId);
+        tab.setAttribute("aria-selected", on ? "true" : "false");
+        panel.hidden = !on;
+        panel.classList.toggle("active", on);
+      });
+    }
+    document.getElementById("tab-a").onclick = () => show("panel-a");
+    document.getElementById("tab-b").onclick = () => show("panel-b");
+    document.getElementById("tab-both").onclick = () => show("panel-both");
+  </script>
+</body>
+</html>

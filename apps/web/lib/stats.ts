@@ -1,4 +1,4 @@
-/** Local streak + daily goal (no auth). */
+/** Streak + daily goal — local always; cloud when authenticated (Stage 1). */
 
 export type HifzStats = {
   streak: number;
@@ -9,6 +9,7 @@ export type HifzStats = {
 };
 
 const KEY = "vk_hifz_stats";
+/** @deprecated Prefer loadSettings().dailyGoal — kept as default fallback. */
 export const DAILY_GOAL = 5;
 
 function todayKey(d = new Date()): string {
@@ -48,6 +49,11 @@ export function loadStats(): HifzStats {
   }
 }
 
+export function saveStatsLocal(next: HifzStats): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(KEY, JSON.stringify(next));
+}
+
 /** Call after each scored recite (perfect or with mistakes). */
 export function recordScoreAttempt(): HifzStats {
   if (typeof window === "undefined") return loadStats();
@@ -71,6 +77,9 @@ export function recordScoreAttempt(): HifzStats {
     todayDay: today,
     totalScores: (prev.totalScores || 0) + 1,
   };
-  window.localStorage.setItem(KEY, JSON.stringify(next));
+  saveStatsLocal(next);
+  void import("./sync-progress")
+    .then((m) => m.pushStatsIfAuthed())
+    .catch(() => {});
   return next;
 }
