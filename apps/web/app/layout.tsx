@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Amiri, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { AuthProvider } from "../components/AuthProvider";
 import { I18nProvider } from "../components/I18nProvider";
+import { PwaInstallButton } from "../components/PwaInstallButton";
+import { PwaRegister } from "../components/PwaRegister";
 import { SettingsHydrate } from "../components/SettingsHydrate";
 import "./globals.css";
 
@@ -22,6 +24,24 @@ const fontAyah = Amiri({
 export const metadata: Metadata = {
   title: "الكُتَّاب أون لاين",
   description: "استمع · كرّر · سجّل — تغذية راجعة على مستوى الكلمة",
+  applicationName: "الكُتَّاب",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "الكُتَّاب",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2D5A3D",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -31,6 +51,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <I18nProvider>
           <AuthProvider>
             <SettingsHydrate />
+            <PwaRegister />
+            <PwaInstallButton />
             {children}
           </AuthProvider>
         </I18nProvider>

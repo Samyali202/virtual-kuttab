@@ -16,6 +16,7 @@ export const fr = {
     ayahs: "versets",
     results: "résultats",
     done: "Terminé",
+    close: "Fermer",
   },
   onboarding: {
     title: "Comment utiliser Al-Kuttab en ligne",
@@ -73,6 +74,7 @@ export const fr = {
     listenProgress: "Progression d’écoute du maître",
     listen: "Écouter",
     listenAgain: "Réécouter",
+    pause: "Pause",
     stopListen: "Arrêter",
     recordNow: "Enregistrer",
     stopRecord: "Arrêter l’enregistrement",
@@ -85,7 +87,7 @@ export const fr = {
     promptIdle: "Écoutez le maître, puis récitez de mémoire.",
     promptAfterListen: "Bien écouté — enregistrez de mémoire maintenant",
     promptRepeat: "Écoutez et répétez après le cheikh.",
-    promptStopped: "Écoute arrêtée — enregistrez ou réécoutez.",
+    promptStopped: "En pause — continuez d’écouter ou enregistrez de mémoire.",
     audioFail: "Lecture audio impossible.",
     noAudio: "Pas d’audio du maître pour ce verset — choisissez-en un autre.",
     micDenied: "Autorisez le micro dans le navigateur pour terminer l’enregistrement.",
@@ -115,6 +117,14 @@ export const fr = {
     progressOf: "{current} sur {total}",
     installHint: "Ajouter Al-Kuttab à l’écran d’accueil",
     later: "Plus tard",
+  },
+  pwa: {
+    install: "Installer l’application sur votre appareil",
+    installShort: "Installer",
+    tooltip:
+      "Installe Al-Kuttab comme application sur l’écran d’accueil pour l’ouvrir rapidement sans navigateur, même avec une connexion faible.",
+    tooltipManual:
+      "Touchez ici, puis dans le menu du navigateur choisissez « Sur l’écran d’accueil » ou « Installer l’application » pour ouvrir Al-Kuttab comme une app.",
   },
   auth: {
     account: "Compte",
@@ -194,7 +204,7 @@ export const fr = {
     sizeSm: "Petit",
     sizeMd: "Moyen",
     sizeLg: "Grand",
-    level: "Niveau",
+    level: "Précision de la prononciation",
     levelChild: "Débutant",
     levelBeginner: "Intermédiaire",
     levelPro: "Avancé",

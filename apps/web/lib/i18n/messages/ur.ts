@@ -16,6 +16,7 @@ export const ur = {
     ayahs: "آیات",
     results: "نتائج",
     done: "ہو گیا",
+    close: "بند کریں",
   },
   onboarding: {
     title: "الکُتّاب آن لائن کیسے استعمال کریں",
@@ -73,6 +74,7 @@ export const ur = {
     listenProgress: "استاد کی سماعت کی پیشرفت",
     listen: "سنیں",
     listenAgain: "دوبارہ سنیں",
+    pause: "موقوف",
     stopListen: "روکیں",
     recordNow: "اب ریکارڈ کریں",
     stopRecord: "ریکارڈنگ روکیں",
@@ -85,7 +87,7 @@ export const ur = {
     promptIdle: "استاد سنیں، پھر حفظ سے پڑھیں۔",
     promptAfterListen: "اچھی سماعت — اب حفظ سے ریکارڈ کریں",
     promptRepeat: "سنیں اور شیخ کے بعد دہرائیں۔",
-    promptStopped: "سماعت رک گئی — ریکارڈ کریں یا دوبارہ سنیں۔",
+    promptStopped: "موقوف — سننا جاری رکھیں یا حفظ سے ریکارڈ کریں۔",
     audioFail: "آڈیو نہیں چل سکی۔",
     noAudio: "اس آیت کے لیے استاد کی آڈیو نہیں — دوسری منتخب کریں۔",
     micDenied: "ریکارڈ مکمل کرنے کے لیے براؤزر میں مائیک کی اجازت دیں۔",
@@ -115,6 +117,14 @@ export const ur = {
     progressOf: "{current} از {total}",
     installHint: "الکُتّاب کو ہوم اسکرین پر شامل کریں",
     later: "بعد میں",
+  },
+  pwa: {
+    install: "ایپ کو اپنے آلے پر انسٹال کریں",
+    installShort: "انسٹال",
+    tooltip:
+      "الکُتّاب کو ہوم اسکرین پر ایپ کی طرح انسٹال کرتا ہے تاکہ بغیر براؤزر کے تیزی سے کھل سکے، کمزور کنکشن پر بھی۔",
+    tooltipManual:
+      "یہاں دبائیں، پھر براؤزر مینو سے «ہوم اسکرین پر شامل کریں» یا «ایپ انسٹال کریں» چنیں تاکہ الکُتّاب الگ ایپ کی طرح کھلے۔",
   },
   auth: {
     account: "اکاؤنٹ",
@@ -194,7 +204,7 @@ export const ur = {
     sizeSm: "چھوٹا",
     sizeMd: "درمیانہ",
     sizeLg: "بڑا",
-    level: "سطح",
+    level: "تلفظ کی درستگی",
     levelChild: "مبتدئ",
     levelBeginner: "متوسط",
     levelPro: "ماہر",

@@ -19,6 +19,7 @@ export const ar = {
     ayahs: "آية",
     results: "نتيجة",
     done: "تم",
+    close: "إغلاق",
   },
   onboarding: {
     title: "كيفية استخدام الكُتَّاب أونلاين",
@@ -76,6 +77,7 @@ export const ar = {
     listenProgress: "تقدّم استماع المعلّم",
     listen: "استمع",
     listenAgain: "استمع مجدداً",
+    pause: "إيقاف مؤقت",
     stopListen: "إيقاف",
     recordNow: "سجّل الآن",
     stopRecord: "إيقاف التسجيل",
@@ -88,7 +90,7 @@ export const ar = {
     promptIdle: "استمع للمعلّم، ثم سجّل من حفظك.",
     promptAfterListen: "أحسنت الاستماع — سجّل الآن من حفظك",
     promptRepeat: "استمع وكرّر بعد الشيخ.",
-    promptStopped: "توقّف الاستماع — سجّل أو استمع مجدداً.",
+    promptStopped: "تم الإيقاف مؤقتاً — تابع الاستماع أو سجّل من حفظك.",
     audioFail: "تعذّر تشغيل الصوت.",
     noAudio: "لا يتوفر صوت المعلّم لهذه الآية — اختر آية أخرى.",
     micDenied: "يلزم السماح بالميكروفون من إعدادات المتصفح لإكمال التسجيل.",
@@ -118,6 +120,14 @@ export const ar = {
     progressOf: "{current} من {total}",
     installHint: "أضف الكُتَّاب للشاشة الرئيسية",
     later: "لاحقاً",
+  },
+  pwa: {
+    install: "تثبيت التطبيق على جهازك",
+    installShort: "تثبيت",
+    tooltip:
+      "يثبّت «الكُتَّاب» كتطبيق على شاشتك الرئيسية لفتحه بسرعة دون المتصفح، ويعمل حتى مع اتصال ضعيف.",
+    tooltipManual:
+      "اضغط هنا ثم من قائمة المتصفح اختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق» لفتح الكُتَّاب كتطبيق مستقل.",
   },
   auth: {
     account: "حساب",
@@ -197,7 +207,7 @@ export const ar = {
     sizeSm: "صغير",
     sizeMd: "وسط",
     sizeLg: "كبير",
-    level: "المستوى",
+    level: "دقة النطق",
     levelChild: "مبتدئ",
     levelBeginner: "متوسط",
     levelPro: "مُتقِن",

@@ -16,6 +16,7 @@ export const en = {
     ayahs: "ayahs",
     results: "results",
     done: "Done",
+    close: "Close",
   },
   onboarding: {
     title: "How to use Virtual Kuttab online",
@@ -73,6 +74,7 @@ export const en = {
     listenProgress: "Teacher listening progress",
     listen: "Listen",
     listenAgain: "Listen again",
+    pause: "Pause",
     stopListen: "Stop",
     recordNow: "Record now",
     stopRecord: "Stop recording",
@@ -85,7 +87,7 @@ export const en = {
     promptIdle: "Listen to the teacher, then recite from memory.",
     promptAfterListen: "Well listened — record from memory now",
     promptRepeat: "Listen and repeat after the sheikh.",
-    promptStopped: "Listening stopped — record or listen again.",
+    promptStopped: "Paused — continue listening or record from memory.",
     audioFail: "Could not play audio.",
     noAudio: "Teacher audio is unavailable for this ayah — pick another.",
     micDenied: "Allow the microphone in browser settings to finish recording.",
@@ -115,6 +117,14 @@ export const en = {
     progressOf: "{current} of {total}",
     installHint: "Add Al-Kuttab to your home screen",
     later: "Later",
+  },
+  pwa: {
+    install: "Install the app on your device",
+    installShort: "Install",
+    tooltip:
+      "Installs Al-Kuttab as an app on your home screen so you can open it quickly without the browser, even on a weak connection.",
+    tooltipManual:
+      "Tap here, then use your browser menu: “Add to Home Screen” or “Install app” to open Al-Kuttab like a standalone app.",
   },
   auth: {
     account: "Account",
@@ -194,7 +204,7 @@ export const en = {
     sizeSm: "Small",
     sizeMd: "Medium",
     sizeLg: "Large",
-    level: "Level",
+    level: "Pronunciation accuracy",
     levelChild: "Beginner",
     levelBeginner: "Intermediate",
     levelPro: "Advanced",

@@ -16,6 +16,7 @@ export const de = {
     ayahs: "Ayat",
     results: "Ergebnisse",
     done: "Fertig",
+    close: "Schließen",
   },
   onboarding: {
     title: "So nutzt du Al-Kuttab Online",
@@ -73,6 +74,7 @@ export const de = {
     listenProgress: "Hörfortschritt des Lehrers",
     listen: "Hören",
     listenAgain: "Nochmal hören",
+    pause: "Pause",
     stopListen: "Stopp",
     recordNow: "Jetzt aufnehmen",
     stopRecord: "Aufnahme stoppen",
@@ -85,7 +87,7 @@ export const de = {
     promptIdle: "Hör dem Lehrer zu, dann auswendig rezitieren.",
     promptAfterListen: "Gut gehört — jetzt auswendig aufnehmen",
     promptRepeat: "Hör zu und wiederhole nach dem Scheich.",
-    promptStopped: "Hören gestoppt — aufnehmen oder nochmal hören.",
+    promptStopped: "Pausiert — weiter hören oder auswendig aufnehmen.",
     audioFail: "Audio konnte nicht abgespielt werden.",
     noAudio: "Kein Lehrer-Audio für diese Aya — wähle eine andere.",
     micDenied: "Erlaube das Mikrofon in den Browser-Einstellungen.",
@@ -115,6 +117,14 @@ export const de = {
     progressOf: "{current} von {total}",
     installHint: "Al-Kuttab zum Startbildschirm hinzufügen",
     later: "Später",
+  },
+  pwa: {
+    install: "App auf dem Gerät installieren",
+    installShort: "Installieren",
+    tooltip:
+      "Installiert Al-Kuttab als App auf dem Startbildschirm — schnell öffnen ohne Browser, auch bei schwacher Verbindung.",
+    tooltipManual:
+      "Tippe hier und wähle im Browser-Menü „Zum Startbildschirm“ oder „App installieren“, um Al-Kuttab wie eine eigenständige App zu nutzen.",
   },
   auth: {
     account: "Konto",
@@ -194,7 +204,7 @@ export const de = {
     sizeSm: "Klein",
     sizeMd: "Mittel",
     sizeLg: "Groß",
-    level: "Niveau",
+    level: "Aussprachegenauigkeit",
     levelChild: "Anfänger",
     levelBeginner: "Mittel",
     levelPro: "Fortgeschritten",
