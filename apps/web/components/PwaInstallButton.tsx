@@ -26,7 +26,19 @@ export function PwaInstallButton() {
   const [hintOpen, setHintOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const hideOps = pathname.startsWith("/vk-ops-console");
-  const visible = !installed && !hideOps;
+  // Never cover the lesson Listen/triptych dock on mobile.
+  const hideLesson = pathname.startsWith("/lesson");
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    try {
+      setDismissed(window.localStorage.getItem("vk_pwa_bar_dismissed") === "1");
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const visible = !installed && !hideOps && !hideLesson && !dismissed;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -131,13 +143,30 @@ export function PwaInstallButton() {
       {hintOpen ? (
         <div id="pwa-install-tip" className="pwa-install-tip" role="tooltip">
           <p>{tooltip}</p>
-          <button
-            type="button"
-            className="pwa-install-tip-close"
-            onClick={() => setHintOpen(false)}
-          >
-            {t("common.close")}
-          </button>
+          <div className="pwa-install-tip-actions">
+            <button
+              type="button"
+              className="pwa-install-tip-close"
+              onClick={() => setHintOpen(false)}
+            >
+              {t("common.close")}
+            </button>
+            <button
+              type="button"
+              className="pwa-install-tip-close"
+              onClick={() => {
+                try {
+                  window.localStorage.setItem("vk_pwa_bar_dismissed", "1");
+                } catch {
+                  /* ignore */
+                }
+                setDismissed(true);
+                setHintOpen(false);
+              }}
+            >
+              {t("lesson.later")}
+            </button>
+          </div>
         </div>
       ) : null}
     </div>

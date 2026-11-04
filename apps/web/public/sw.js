@@ -1,5 +1,5 @@
 /* Virtual Kuttab — minimal service worker for PWA installability. */
-const CACHE = "vk-shell-v1";
+const CACHE = "vk-shell-v2";
 const PRECACHE = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {

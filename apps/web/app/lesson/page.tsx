@@ -21,6 +21,8 @@ import {
   IconBook,
   IconChevronLeft,
   IconChevronRight,
+  IconPause,
+  IconPlay,
   IconTranslate,
 } from "../../components/NavIcons";
 import { useI18n } from "../../components/I18nProvider";
@@ -410,18 +412,34 @@ function LessonInner() {
     };
   }, [audioUrl, rebuildTimings]);
 
-  async function playListen() {
-    if (!audioRef.current || !current || !hasAudio) return;
-    resetWords(current.text_uthmani);
-    const tokens = splitWords(current.text_uthmani);
-    const dur = audioRef.current.duration;
-    if (dur && Number.isFinite(dur)) applyParsedTimings(tokens, dur);
-    karaokeOnRef.current = true;
-    setWords(tokens.map((t) => ({ ref_token: t, status: "pending", active: false })));
-    audioRef.current.currentTime = 0;
-    setProgress(0);
+  async function playListen(opts?: { restart?: boolean }) {
+    const el = audioRef.current;
+    if (!el || !current || !hasAudio) return;
+    const dur = el.duration;
+    const nearEnd =
+      Number.isFinite(dur) && dur > 0 && el.currentTime >= Math.max(0, dur - 0.2);
+    const canResume =
+      !opts?.restart &&
+      !el.ended &&
+      !nearEnd &&
+      el.currentTime > 0.05 &&
+      Number.isFinite(dur) &&
+      dur > 0;
+
+    if (!canResume) {
+      resetWords(current.text_uthmani);
+      const tokens = splitWords(current.text_uthmani);
+      if (dur && Number.isFinite(dur)) applyParsedTimings(tokens, dur);
+      karaokeOnRef.current = true;
+      setWords(tokens.map((tok) => ({ ref_token: tok, status: "pending", active: false })));
+      el.currentTime = 0;
+      setProgress(0);
+    } else {
+      karaokeOnRef.current = true;
+    }
+
     try {
-      await audioRef.current.play();
+      await el.play();
       setMessage(t("lesson.promptRepeat"));
     } catch {
       setPhase("idle");
@@ -429,7 +447,7 @@ function LessonInner() {
     }
   }
 
-  function stopListen() {
+  function pauseListen() {
     const el = audioRef.current;
     if (!el) return;
     el.pause();
@@ -437,6 +455,11 @@ function LessonInner() {
     setWords((prev) => prev.map((w) => ({ ...w, active: false })));
     setPhase("idle");
     setMessage(t("lesson.promptStopped"));
+  }
+
+  /** @deprecated alias — pause keeps position so Play can resume */
+  function stopListen() {
+    pauseListen();
   }
 
   function seekListen(value: number) {
@@ -715,30 +738,84 @@ function LessonInner() {
 
   const primary = useMemo(() => {
     if (phase === "listening") {
-      return { label: t("lesson.stopListen"), action: "stop_listen" as const, pulse: false, stop: false };
+      return {
+        label: t("lesson.pause"),
+        action: "stop_listen" as const,
+        pulse: false,
+        stop: false,
+        icon: "pause" as const,
+      };
     }
     if (phase === "recording") {
-      return { label: t("lesson.stopRecord"), action: "stop_recite" as const, pulse: false, stop: true };
+      return {
+        label: t("lesson.stopRecord"),
+        action: "stop_recite" as const,
+        pulse: false,
+        stop: true,
+        icon: null,
+      };
     }
     if (phase === "scoring") {
-      return { label: t("lesson.scoring"), action: "none" as const, pulse: false, stop: false };
+      return {
+        label: t("lesson.scoring"),
+        action: "none" as const,
+        pulse: false,
+        stop: false,
+        icon: null,
+      };
     }
     if (phase === "success") {
-      return { label: t("lesson.nextAyah"), action: "next" as const, pulse: false, stop: false };
+      return {
+        label: t("lesson.nextAyah"),
+        action: "next" as const,
+        pulse: false,
+        stop: false,
+        icon: null,
+      };
     }
     if (phase === "surah_done") {
-      return { label: t("lesson.nextSurah"), action: "next_surah" as const, pulse: false, stop: false };
+      return {
+        label: t("lesson.nextSurah"),
+        action: "next_surah" as const,
+        pulse: false,
+        stop: false,
+        icon: null,
+      };
     }
     if (phase === "retry") {
-      return { label: t("lesson.retryRecord"), action: "recite" as const, pulse: false, stop: false };
+      return {
+        label: t("lesson.retryRecord"),
+        action: "recite" as const,
+        pulse: false,
+        stop: false,
+        icon: null,
+      };
     }
     if (phase === "ready_recite") {
-      return { label: t("lesson.recordNow"), action: "recite" as const, pulse: true, stop: false };
+      return {
+        label: t("lesson.recordNow"),
+        action: "recite" as const,
+        pulse: true,
+        stop: false,
+        icon: null,
+      };
     }
     if (phase === "mic_denied") {
-      return { label: t("mic.tryAgain"), action: "recite" as const, pulse: false, stop: false };
+      return {
+        label: t("mic.tryAgain"),
+        action: "recite" as const,
+        pulse: false,
+        stop: false,
+        icon: null,
+      };
     }
-    return { label: t("lesson.listen"), action: "listen" as const, pulse: false, stop: false };
+    return {
+      label: t("lesson.listen"),
+      action: "listen" as const,
+      pulse: false,
+      stop: false,
+      icon: "play" as const,
+    };
   }, [phase, t]);
 
   const showDockMic =
@@ -1113,7 +1190,11 @@ function LessonInner() {
                 max={duration || 1}
                 step={0.01}
                 value={Math.min(progress, duration || 0)}
-                disabled={!hasAudio || !duration || phase !== "listening"}
+                disabled={
+                  !hasAudio ||
+                  !duration ||
+                  (phase !== "listening" && phase !== "idle" && phase !== "ready_recite")
+                }
                 onChange={(e) => seekListen(Number(e.target.value))}
                 aria-valuemin={0}
                 aria-valuemax={duration || 0}
@@ -1178,25 +1259,67 @@ function LessonInner() {
               }}
             />
           ) : null}
-          <div className="actions actions-single">
+          <div
+            className="actions actions-triptych"
+            role="group"
+            aria-label={t("lesson.labelAyah")}
+            dir="ltr"
+          >
+            <button
+              type="button"
+              className="tri-side"
+              aria-label={t("lesson.prevAyah")}
+              disabled={
+                !canGoPrev ||
+                busy ||
+                phase === "recording" ||
+                phase === "scoring"
+              }
+              onClick={navigatePrevAyah}
+            >
+              <IconChevronLeft />
+            </button>
             <button
               type="button"
               className={[
+                "tri-main",
                 primary.stop ? "stop" : "",
                 primary.pulse ? "cta-pulse" : "",
               ]
                 .filter(Boolean)
-                .join(" ") || undefined}
+                .join(" ")}
               onClick={runPrimary}
               disabled={primaryDisabled}
+              aria-label={primary.label}
             >
-              {primary.label}
+              {primary.icon === "play" ? <IconPlay /> : null}
+              {primary.icon === "pause" ? <IconPause /> : null}
+              <span>{primary.label}</span>
+            </button>
+            <button
+              type="button"
+              className="tri-side"
+              aria-label={t("lesson.nextAyah")}
+              disabled={
+                !canGoNext ||
+                busy ||
+                phase === "recording" ||
+                phase === "scoring"
+              }
+              onClick={navigateNextAyah}
+            >
+              <IconChevronRight />
             </button>
           </div>
         </div>
 
         {phase === "ready_recite" || phase === "idle" || phase === "retry" ? (
-          <button type="button" className="dock-link" onClick={() => void playListen()} disabled={!hasAudio || busy}>
+          <button
+            type="button"
+            className="dock-link"
+            onClick={() => void playListen({ restart: true })}
+            disabled={!hasAudio || busy}
+          >
             {t("lesson.listenAgain")}
           </button>
         ) : null}

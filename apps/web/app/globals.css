@@ -19,6 +19,9 @@
   --vk-bad-soft: #f8d9d4;
   --vk-focus: #2f6b4f;
   --vk-on-sage: #ffffff;
+  /* Install bar — warm gold, distinct from sage Listen CTAs */
+  --vk-install: #b08a2e;
+  --vk-on-install: #fffdf6;
 
   --vk-font-ayah: var(--font-vk-ayah), "Amiri", "Noto Naskh Arabic", serif;
   --vk-font-ui: var(--font-vk-ui), "IBM Plex Sans Arabic", Tahoma, sans-serif;
@@ -80,6 +83,8 @@ html[data-theme="night"] {
   --vk-bad: #e08a7c;
   --vk-bad-soft: #3a2220;
   --vk-on-sage: #102018;
+  --vk-install: #d4b45e;
+  --vk-on-install: #1a1508;
   --vk-shadow-dock: 0 -8px 24px rgba(0, 0, 0, 0.35);
 }
 
@@ -1667,15 +1672,15 @@ html[dir="ltr"] .icon-nav-back {
   flex: 0 0 auto;
 }
 
-/* PWA install — own row at the top, solid sage, never overlays text or the dock. */
+/* PWA install — top bar in gold (not sage) so it stands out from Listen. */
 .pwa-install-bar {
   position: relative;
   z-index: 30;
   flex-shrink: 0;
-  background: var(--vk-sage);
-  color: var(--vk-on-sage);
+  background: var(--vk-install);
+  color: var(--vk-on-install);
   padding-top: env(safe-area-inset-top, 0px);
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, #000 22%, transparent);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, #000 18%, transparent);
 }
 
 body:has(.pwa-install-bar) .lesson {
@@ -1712,11 +1717,11 @@ body:has(.pwa-install-bar) .lesson {
 
 .pwa-install-btn:hover,
 .pwa-install-btn:focus-visible {
-  background: color-mix(in srgb, var(--vk-on-sage) 14%, transparent);
+  background: color-mix(in srgb, var(--vk-on-install) 14%, transparent);
 }
 
 .pwa-install-btn:focus-visible {
-  outline: 3px solid var(--vk-on-sage);
+  outline: 3px solid var(--vk-on-install);
   outline-offset: -5px;
 }
 
@@ -1742,7 +1747,14 @@ body:has(.pwa-install-bar) .lesson {
   line-height: 1.45;
   font-weight: 600;
   text-wrap: pretty;
-  color: var(--vk-on-sage);
+  color: var(--vk-on-install);
+}
+
+.pwa-install-tip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
 .pwa-install-tip-close {
@@ -1753,8 +1765,8 @@ body:has(.pwa-install-bar) .lesson {
   padding: 0 1rem;
   border: none;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--vk-on-sage) 16%, transparent);
-  color: var(--vk-on-sage);
+  background: color-mix(in srgb, var(--vk-on-install) 16%, transparent);
+  color: var(--vk-on-install);
   font: inherit;
   font-size: 0.85rem;
   font-weight: 800;
@@ -1763,11 +1775,11 @@ body:has(.pwa-install-bar) .lesson {
 
 .pwa-install-tip-close:hover,
 .pwa-install-tip-close:focus-visible {
-  background: color-mix(in srgb, var(--vk-on-sage) 28%, transparent);
+  background: color-mix(in srgb, var(--vk-on-install) 28%, transparent);
 }
 
 .pwa-install-tip-close:focus-visible {
-  outline: 3px solid var(--vk-on-sage);
+  outline: 3px solid var(--vk-on-install);
   outline-offset: 2px;
 }
 
